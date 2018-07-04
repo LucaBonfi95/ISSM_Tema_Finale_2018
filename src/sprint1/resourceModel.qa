@@ -1,0 +1,72 @@
+System robot
+
+Event updateTemperature : updateTemperature(NAME, NEW_TEMP)
+Event updateTime		: updateTime(NAME, CURRENT_TIME)
+Event turnLed 			: turnLed(NAME, NEW_STATE)
+
+Event modelChanged 		: modelChanged(resource(NAME, STATE))
+
+
+Context ctxResourceModel ip[host="localhost" port=8099]
+
+QActor resource_model_led context ctxResourceModel {
+	
+	Plan init normal [
+		println("resource_model STARTED");
+		demo consult("resourceModel.pl")
+	]
+	switchTo waitForInputs
+	
+	Plan waitForInputs []
+	transition
+		stopAfter 1000000
+		whenEvent turnLed -> handleTurnLed
+	finally repeatPlan
+	
+	Plan handleTurnLed resumeLastPlan [
+		onEvent turnLed : turnLed(NAME, STATE) ->
+			demo changeModelItem(NAME, turnLed(STATE))
+	]
+	
+}
+
+QActor resource_model_time context ctxResourceModel {
+	
+	Plan init normal [
+		println("resource_model STARTED");
+		demo consult("resourceModel.pl")
+	]
+	switchTo waitForInputs
+	
+	Plan waitForInputs []
+	transition
+		stopAfter 1000000
+		whenEvent updateTime -> handleUpdateTime
+	finally repeatPlan
+	
+	Plan handleUpdateTime resumeLastPlan [
+		onEvent updateTime : updateTime(timer, STATE) ->
+			demo changeModelItem(timer, updateTime(STATE))
+	]
+
+}
+
+QActor resource_model_temperature context ctxResourceModel {
+	
+	Plan init normal [
+		println("resource_model STARTED");
+		demo consult("resourceModel.pl")
+	]
+	switchTo waitForInputs
+	
+	Plan waitForInputs []
+	transition
+		stopAfter 1000000
+		whenEvent updateTemperature -> handleUpdateTemperature
+	finally repeatPlan
+	
+	Plan handleUpdateTemperature resumeLastPlan [
+		onEvent updateTemperature : updateTemperature(temp, STATE) ->
+			demo changeModelItem(temp, updateTemperature(STATE))
+	]
+}
