@@ -1,0 +1,46 @@
+System systemRobot
+
+// payload: cmdstart o cmdstop
+Dispatch userCmd : userCmd(X)
+Event robotCmd : robotCmd(X)
+
+Context ctxProbRobot ip[host="localhost" port=5400] -standalone 
+Context ctxProbUser ip[host="localhost" port=5500] 
+
+QActor gui context ctxProbUser {
+	Plan initial normal [
+		println("Gui started")
+	] 
+	switchTo waitForMsg
+	
+	Plan waitForMsg [
+	]
+	transition stopAfter 600000
+		whenMsg userCmd -> handleMsg
+	finally repeatPlan
+	
+	Plan handleMsg resumeLastPlan [ 
+		println("Gui receives user message");
+		onMsg userCmd : userCmd(X) -> emit robotCmd : robotCmd(X)
+	]  
+}
+
+QActor user context ctxProbUser {
+	Rules {
+		isUserAuthenticated.
+	}
+	
+	Plan initial normal [
+		println("User started")
+	]
+	switchTo sendMsg
+	
+	Plan sendMsg[
+		println("User send messages");
+		[ !? isUserAuthenticated ]
+			forward gui -m userCmd : userCmd(cmdstart);
+		delay 2000;
+		[ !? isUserAuthenticated ]
+			forward gui -m userCmd : userCmd(cmdstop)
+	]
+}

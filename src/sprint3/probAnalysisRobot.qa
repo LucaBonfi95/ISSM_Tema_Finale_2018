@@ -1,0 +1,172 @@
+System systemRobot
+
+Event robotCmd : robotCmd(X)
+Event sensorEvent : sensorEvent(X)
+Event outCmd : outCmd(X)
+
+Context ctxProbRobot ip[host="localhost" port=5400] 
+
+QActor robot context ctxProbRobot {  
+	Rules {
+		limitTemperatureValue(25).
+		minTime(7).
+		maxTime(10).
+		currentTempValue(0).
+		currentTimeValue(0).
+		evalTemp:-
+			limitTemperatureValue(MAX), 
+			currentTempValue(VALUE),
+ 		    eval(ge, MAX, VALUE).	
+ 		notEvalTemp:-    
+ 			limitTemperatureValue(MAX), 
+			currentTempValue(VALUE),
+ 		    eval(lt, MAX, VALUE).	
+ 		evalTime:-
+ 			minTime(MIN),
+ 			maxTime(MAX),
+ 			currentTimeValue(VALUE),
+ 			eval(ge, VALUE, MIN),
+ 			eval(ge, MAX, VALUE).
+ 		notEvalTime:-
+ 			minTime(MIN),
+ 			maxTime(MAX),
+ 			currentTimeValue(VALUE),
+ 			eval(lt, VALUE, MIN).
+ 		notEvalTime:-
+ 			minTime(MIN),
+ 			maxTime(MAX),
+ 			currentTimeValue(VALUE),
+ 			eval(lt, MAX, VALUE).
+		startRequirementsOk :- evalTemp, evalTime.
+	}
+	
+	Plan initial normal [
+		println("Robot started");
+		delay 2000
+	] 
+	
+	switchTo waitForEvent
+	
+	Plan waitForEvent [
+	]
+	transition stopAfter 600000
+		whenEvent robotCmd -> handleEvent,
+		whenEvent sensorEvent -> handleEvent
+	finally repeatPlan
+		
+	Plan handleEvent resumeLastPlan [
+		onEvent robotCmd : robotCmd(cmdstart) -> { 
+			[ !? startRequirementsOk ] {
+				println("Robot start"); 
+				emit outCmd : outCmd(startblinking)
+			}
+		}; 
+		onEvent robotCmd : robotCmd(cmdstop) -> { 
+			println("Robot stop from user"); 
+			emit outCmd : outCmd(stopblinking)	
+		}; 
+		onEvent sensorEvent : sensorEvent(sonar1) -> println("Robot receives event from sonar1");
+		onEvent sensorEvent : sensorEvent(sonar2) -> println("Robot receives event from sonar2");
+		onEvent sensorEvent : sensorEvent(temp(VALUE)) -> ReplaceRule currentTempValue(X) with currentTempValue(VALUE);
+		onEvent sensorEvent : sensorEvent(temp(X)) -> {
+			[ !? notEvalTemp ] {
+				println("Robot stop from temperature sensor"); 
+				emit outCmd : outCmd(stopblinking)	
+			}
+		};
+		onEvent sensorEvent : sensorEvent(timer(VALUE)) -> ReplaceRule currentTimeValue(X) with currentTimeValue(VALUE);
+		onEvent sensorEvent : sensorEvent(timer(X)) -> {
+			[ !? notEvalTime ] {
+				println("Robot stop from time sensor"); 
+				emit outCmd : outCmd(stopblinking)	
+			}
+		};
+		printCurrentEvent
+	] 
+}
+
+QActor sonarsensor1 context ctxProbRobot {
+	Plan initial normal[
+		println("Sonar1 started");
+		delay 3000
+	]
+	switchTo emitEvents
+	
+	Plan emitEvents[
+		emit sensorEvent : sensorEvent(sonar1)
+	]
+}
+
+QActor sonarsensor2 context ctxProbRobot {
+	Plan initial normal[
+		println("Sonar2 started");
+		delay 3500
+	]
+	switchTo emitEvents
+	
+	Plan emitEvents[
+		emit sensorEvent : sensorEvent(sonar2)
+	]
+}
+
+QActor temperaturesensor context ctxProbRobot {
+	Plan initial normal[
+		println("Temperature sensor started");
+		delay 4000
+	]
+	switchTo emitEvents
+	
+	Plan emitEvents[
+		emit sensorEvent : sensorEvent(temp(20));
+		delay 2000;
+		emit sensorEvent : sensorEvent(temp(30))
+	]
+}
+
+QActor timersensor context ctxProbRobot {
+	Plan initial normal[
+		println("Timer sensor started");
+		delay 4500
+	]
+	switchTo emitEvents
+	
+	Plan emitEvents[
+		emit sensorEvent : sensorEvent(timer(9));
+		delay 2000;
+		emit sensorEvent : sensorEvent(timer(12))
+	]
+}
+
+QActor led context ctxProbRobot {
+	Plan initial normal[
+		println("Led started")
+	]
+	switchTo waitForEvent
+	
+	Plan waitForEvent[]	
+	transition stopAfter 600000
+		whenEvent outCmd -> handleEvent
+	finally repeatPlan
+	
+	Plan handleEvent resumeLastPlan [ 
+		onEvent outCmd : outCmd(startblinking) -> println("Led start blinking");
+		onEvent outCmd : outCmd(stopblinking) -> println("Led stop blinking")
+	]  
+}
+
+QActor huelamp context ctxProbRobot {
+	Plan initial normal[
+		println("Hue Lamp started")
+	]
+	switchTo waitForEvent
+	
+	Plan waitForEvent[]	
+	transition stopAfter 600000
+		whenEvent outCmd -> handleEvent
+	finally repeatPlan
+	
+	Plan handleEvent resumeLastPlan [ 
+		onEvent outCmd : outCmd(startblinking) -> println("Hue Lamp start blinking");
+		onEvent outCmd : outCmd(stopblinking) -> println("Hue Lamp stop blinking")
+	]  
+}
