@@ -1,0 +1,117 @@
+System systemRobot
+
+Event robotCmd : robotCmd(X)
+Event sensorEvent : sensorEvent(X)
+Event outCmd : outCmd(X)
+
+Context ctxRobot ip[host="localhost" port=5400] 
+
+QActor robot context ctxRobot {  
+	Plan initial normal [
+		println("Robot started");
+		delay 2000
+	] 
+	
+	switchTo waitForEvent
+	
+	Plan waitForEvent [
+	]
+	transition stopAfter 600000
+		whenEvent robotCmd -> handleEvent,
+		whenEvent sensorEvent -> handleEvent
+	finally repeatPlan
+		
+	Plan handleEvent resumeLastPlan [
+		onEvent robotCmd : robotCmd(X) -> { 
+			println("Robot receives event from user"); 
+			emit outCmd : outCmd(X)
+		}; 
+		onEvent sensorEvent : sensorEvent(sonar1) -> println("Robot receives event from sonar1");
+		onEvent sensorEvent : sensorEvent(sonar2) -> println("Robot receives event from sonar2");
+		onEvent sensorEvent : sensorEvent(temp) -> println("Robot receives event from temperature sensor");
+		onEvent sensorEvent : sensorEvent(timer) -> println("Robot receives event from timer sensor");
+		printCurrentEvent
+	] 
+}
+
+QActor sonarsensor1 context ctxRobot {
+	Plan initial normal[
+		println("Sonar1 started");
+		delay 3000
+	]
+	switchTo emitEvents
+	
+	Plan emitEvents[
+		emit sensorEvent : sensorEvent(sonar1)
+	]
+}
+
+QActor sonarsensor2 context ctxRobot {
+	Plan initial normal[
+		println("Sonar2 started");
+		delay 3500
+	]
+	switchTo emitEvents
+	
+	Plan emitEvents[
+		emit sensorEvent : sensorEvent(sonar2)
+	]
+}
+
+QActor temperaturesensor context ctxRobot {
+	Plan initial normal[
+		println("Temperature sensor started");
+		delay 4000
+	]
+	switchTo emitEvents
+	
+	Plan emitEvents[
+		emit sensorEvent : sensorEvent(temp)
+	]
+}
+
+QActor timersensor context ctxRobot {
+	Plan initial normal[
+		println("Timer sensor started");
+		delay 4500
+	]
+	switchTo emitEvents
+	
+	Plan emitEvents[
+		emit sensorEvent : sensorEvent(timer)
+	]
+}
+
+QActor led context ctxRobot {
+	Plan initial normal[
+		println("Led started")
+	]
+	switchTo waitForEvent
+	
+	Plan waitForEvent[]	
+	transition stopAfter 600000
+		whenEvent outCmd -> handleEvent
+	finally repeatPlan
+	
+	Plan handleEvent resumeLastPlan [ 
+		println("Led receives event");
+		printCurrentEvent
+	]  
+}
+
+QActor huelamp context ctxRobot {
+	Plan initial normal[
+		println("Hue Lamp started")
+	]
+	switchTo waitForEvent
+	
+	Plan waitForEvent[]	
+	transition stopAfter 600000
+		whenEvent outCmd -> handleEvent
+	finally repeatPlan
+	
+	Plan handleEvent resumeLastPlan [ 
+		println("Hue Lamp receives event");
+		printCurrentEvent
+	]  
+}
