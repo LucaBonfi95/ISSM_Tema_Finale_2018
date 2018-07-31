@@ -1,0 +1,65 @@
+System robot
+
+Event updateTemperature : updateTemperature(NAME, NEW_TEMP)
+Event updateTime		: updateTime(NAME, CURRENT_TIME)
+
+// It's only used for the input_element
+Event modelChanged 		: modelChanged(resource(NAME, STATE))
+
+Context ctxResourceModel ip[host="localhost" port=8099] -standalone 
+Context ctxInput ip[host="localhost" port=8096]
+
+QActor temperature_sensor_adapter context ctxInput {
+	
+	Plan init normal [
+		println("resource_model STARTED");
+		delay 500
+	]
+	switchTo sendEvents
+	
+	Plan sendEvents [
+		delay 1000;
+		emit updateTemperature : updateTemperature(temp, 12)
+	]
+	finally repeatPlan
+	
+}
+
+QActor timer_adapter context ctxInput {
+	
+	Plan init normal [
+		println("resource_model STARTED")
+	]
+	switchTo sendEvents
+	
+	Plan sendEvents [
+		delay 1000;
+		emit updateTime : updateTime(timer, currentTime(hours(132), minutes(23), seconds(213)))
+	]
+	finally repeatPlan
+	
+}
+
+
+// It simulates the robot movement
+QActor input_element context ctxInput {
+	
+	Plan init normal [
+		println("input_element STARTED")
+	]
+	switchTo working
+	
+	Plan working [
+		// interact with the implementation of the specific input element and emit the data to modify the resourceModel
+		delay 450;
+		println("Now the robot is moving");
+		emit modelChanged : modelChanged(resource(name(robot), state(movement(movingForward), obstacleDetected(false))));
+		delay 2350;
+		println("Now the robot is stopped");
+		emit modelChanged : modelChanged(resource(name(robot), state(movement(stopped), obstacleDetected(false))));
+		
+		delay 4000
+	]
+	finally repeatPlan
+	
+}

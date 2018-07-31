@@ -1,0 +1,117 @@
+System robot
+
+Event updateTemperature : updateTemperature(NAME, NEW_TEMP)
+Event updateTime		: updateTime(NAME, CURRENT_TIME)
+Event turnLed 			: turnLed(NAME, NEW_STATE)
+Event temperatureIsOk	: temperatureIsOk(STATE)
+Event timeIsOk	: timeIsOk(STATE)
+
+Event modelChanged 		: modelChanged(resource(NAME, STATE))
+
+
+Context ctxResourceModel ip[host="localhost" port=8099]
+
+QActor resource_model_led context ctxResourceModel {
+	
+	Plan init normal [
+		println("resource_model STARTED");
+		demo consult("resourceModel.pl")
+	]
+	switchTo waitForInputs
+	
+	Plan waitForInputs []
+	transition
+		stopAfter 1000000
+		whenEvent turnLed -> handleTurnLed
+	finally repeatPlan
+	
+	Plan handleTurnLed resumeLastPlan [
+		onEvent turnLed : turnLed(NAME, STATE) ->
+			demo changeModelItem(NAME, turnLed(STATE))
+	]
+	
+}
+
+QActor resource_model_time context ctxResourceModel {
+	
+	Rules {
+		minTime(hours(0), minutes(0), seconds(0)).
+		maxTime(hours(0), minutes(0), seconds(0)).
+		
+		
+	}
+	
+	Plan init normal [
+		println("resource_model STARTED");
+		demo consult("resourceModel.pl")
+	]
+	switchTo waitForInputs
+	
+	Plan waitForInputs []
+	transition
+		stopAfter 1000000
+		whenEvent updateTime -> handleUpdateTime
+	finally repeatPlan
+	
+	Plan handleUpdateTime resumeLastPlan [
+		onEvent updateTime : updateTime(timer, STATE) ->
+			demo changeModelItem(timer, updateTime(STATE))
+	]
+
+}
+
+QActor resource_model_temperature context ctxResourceModel {
+	
+	Rules {
+		limitTemperatureValue( 25 ).
+		
+		changedModelAction(resource(name(temp), state(temperature(VALUE)))) :-
+				limitTemperatureValue(MAX),
+				eval(ge, MAX, VALUE), !,
+				changeModelItem(temperatureIsOk, true).
+				
+		changedModelAction(resource(name(temp), state(temperature(VALUE)))) :-
+				changeModelItem(temperatureIsOk, false).
+	}
+	
+	Plan init normal [
+		println("resource_model STARTED");
+		demo consult("resourceModel.pl")
+	]
+	switchTo waitForInputs
+	
+	Plan waitForInputs []
+	transition
+		stopAfter 1000000
+		whenEvent updateTemperature -> handleUpdateTemperature
+	finally repeatPlan
+	
+	Plan handleUpdateTemperature resumeLastPlan [
+		onEvent updateTemperature : updateTemperature(temp, STATE) ->
+			demo changeModelItem(temp, updateTemperature(STATE))
+	]
+}
+
+
+
+
+
+QActor time_ok context ctxResourceModel {
+	
+	Plan init normal [
+		println("resource_model STARTED");
+		demo consult("resourceModel.pl")
+	]
+	switchTo waitForInputs
+	
+	Plan waitForInputs []
+	transition
+		stopAfter 1000000
+		whenEvent temperatureIsOk -> changeTimeOk
+	finally repeatPlan
+	
+	Plan changeTimeOk resumeLastPlan [
+		onEvent timeIsOk : timeIsOk(STATE) ->
+			demo changeModelItem(timeIsOk, STATE)
+	]
+}
