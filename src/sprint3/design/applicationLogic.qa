@@ -1,0 +1,84 @@
+System robot
+
+Event turnLed 			: turnLed(NAME, NEW_STATE)
+
+Event modelChanged 		: modelChanged(resource(NAME, STATE))
+
+Dispatch msgBlinkOn 	: msgBlinkOn
+Dispatch msgBlinkOff 	: msgBlinkOff 
+
+Context ctxResourceModel ip[host="localhost" port=8099] -standalone 
+Context ctxApplicationLogic ip[host="localhost" port=8097]
+
+QActor robot_movement_finder context ctxApplicationLogic {
+	Plan init normal [
+		println("robot_movement_finder STARTED")
+	]
+	switchTo waitForModelChanged
+	
+	Plan waitForModelChanged []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> applLogic
+	finally
+		repeatPlan
+		
+	Plan applLogic resumeLastPlan [
+		onEvent modelChanged : modelChanged(resource(name(robot), state(movement(stopped), X))) -> 
+			forward blink_controller -m msgBlinkOff : msgBlinkOff;
+		
+		onEvent modelChanged : modelChanged(resource(name(robot), state(movement(movingForward), X))) -> 
+			forward blink_controller -m msgBlinkOn : msgBlinkOn;
+			
+		onEvent modelChanged : modelChanged(resource(name(robot), state(movement(movingBackward), X))) -> 
+			forward blink_controller -m msgBlinkOn : msgBlinkOn
+			
+//		onEvent modelChanged : modelChanged(resource(name(robot), state(movement(turningLeft), X))) -> 
+//			forward blink_controller -m msgBlinkOn : msgBlinkOn;
+//		
+//		onEvent modelChanged : modelChanged(resource(name(robot), state(movement(turningRight), X))) -> 
+//			forward blink_controller -m msgBlinkOn : msgBlinkOn
+	]
+}
+
+QActor blink_controller context ctxApplicationLogic {
+	// the behaviour is the same for the real led and for the hue lamp
+	
+	Rules {
+		// rules needed by the application logic
+		ledName(led).
+	}
+	
+	Plan init normal [
+		println("blink_controller STARTED")
+	]
+	switchTo ledOff
+	
+	Plan ledOff [
+		println("Stato: ledOff");
+		[ !? ledName(NAME) ]
+			emit turnLed : turnLed(NAME, off)
+	]
+	transition
+		stopAfter 6000000
+		whenMsg msgBlinkOn -> ledBlinkingOn
+	
+	Plan ledBlinkingOn [
+		println("Stato: ledBlinking on");
+		[ !? ledName(NAME) ]
+			emit turnLed : turnLed(NAME, on)
+	]
+	transition
+		whenTime 500 -> ledBlinkingOff,
+		whenMsg msgBlinkOff -> ledOff
+		
+	Plan ledBlinkingOff [
+		println("Stato: ledBlinking off");
+		[ !? ledName(NAME) ]
+			emit turnLed : turnLed(NAME, off)
+	]
+	transition
+		whenTime 500 -> ledBlinkingOn,
+		whenMsg msgBlinkOff -> ledOff
+	
+}

@@ -1,0 +1,167 @@
+System blink
+
+
+// input
+Event turnLed : turnLed(NAME, NEW_STATE)
+
+Event modelChanged : modelChanged(resource(NAME, STATE))
+
+Dispatch msgBlinkOn : msgBlinkOn
+Dispatch msgBlinkOff : msgBlinkOff 
+
+Context ctxBlink ip[host="localhost" port=8099]
+
+QActor resource_model context ctxBlink {
+	
+	Rules {
+		resource(name(led), state(off)).
+	}
+	
+	Plan init normal [
+		println("resource_model STARTED");
+		demo consult("resourceModel.pl")
+	]
+	switchTo waitForInputs
+	
+	Plan waitForInputs []
+	transition
+		stopAfter 1000000
+		whenEvent turnLed -> handleTurnLed
+	finally repeatPlan
+	
+	Plan handleTurnLed resumeLastPlan [
+		onEvent turnLed : turnLed(NAME, STATE) ->
+			demo changeModelItem(NAME, turnLed(STATE))
+	]
+	
+}
+
+QActor robot_movement_finder context ctxBlink {
+	Plan init normal [
+		println("robot_movement_finder STARTED")
+	]
+	switchTo waitForModelChanged
+	
+	Plan waitForModelChanged []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> applLogic
+	finally
+		repeatPlan
+		
+	Plan applLogic resumeLastPlan [
+		onEvent modelChanged : modelChanged(resource(name(robot), state(movement(stopped), X))) -> 
+			forward blink_controller -m msgBlinkOff : msgBlinkOff;
+		
+		onEvent modelChanged : modelChanged(resource(name(robot), state(movement(movingForward), X))) -> 
+			forward blink_controller -m msgBlinkOn : msgBlinkOn;
+			
+		onEvent modelChanged : modelChanged(resource(name(robot), state(movement(movingBackward), X))) -> 
+			forward blink_controller -m msgBlinkOn : msgBlinkOn
+			
+//		onEvent modelChanged : modelChanged(resource(name(robot), state(movement(turningLeft), X))) -> 
+//			forward blink_controller -m msgBlinkOn : msgBlinkOn;
+//		
+//		onEvent modelChanged : modelChanged(resource(name(robot), state(movement(turningRight), X))) -> 
+//			forward blink_controller -m msgBlinkOn : msgBlinkOn
+	]
+}
+
+QActor blink_controller context ctxBlink {
+	// the behaviour is the same for the real led and for the hue lamp
+	
+	Rules {
+		// rules needed by the application logic
+		ledName(led).
+	}
+	
+	Plan init normal [
+		println("blink_controller STARTED")
+	]
+	switchTo ledOff
+	
+	Plan ledOff [
+		println("Stato: ledOff");
+		[ !? ledName(NAME) ]
+			emit turnLed : turnLed(NAME, off)
+	]
+	transition
+		stopAfter 6000000
+		whenMsg msgBlinkOn -> ledBlinkingOn
+	
+	Plan ledBlinkingOn [
+		println("Stato: ledBlinking on");
+		[ !? ledName(NAME) ]
+			emit turnLed : turnLed(NAME, on)
+	]
+	transition
+		whenTime 500 -> ledBlinkingOff,
+		whenMsg msgBlinkOff -> ledOff
+		
+	Plan ledBlinkingOff [
+		println("Stato: ledBlinking off");
+		[ !? ledName(NAME) ]
+			emit turnLed : turnLed(NAME, off)
+	]
+	transition
+		whenTime 500 -> ledBlinkingOn,
+		whenMsg msgBlinkOff -> ledOff
+	
+}
+
+
+QActor input_element context ctxBlink {
+	
+	Plan init normal [
+		println("input_element STARTED")
+	]
+//	switchTo working
+	
+	Plan working [
+		// interact with the implementation of the specific input element and emit the data to modify the resourceModel
+		delay 450;
+		println("Now the robot is moving");
+		emit modelChanged : modelChanged(resource(name(robot), state(movement(movingForward), obstacleDetected(false))));
+		delay 2350;
+		println("Now the robot is stopped");
+		emit modelChanged : modelChanged(resource(name(robot), state(movement(stopped), obstacleDetected(false))));
+		
+		delay 4000
+	]
+	finally repeatPlan
+	
+}
+
+
+QActor resource_representation_element context ctxBlink {
+
+	Rules {
+		// rules needed by the application logic
+		ledName(led).
+	}
+	
+	
+	Plan init normal [
+		println("resource_representation_element STARTED");
+		javaRun it.unibo.custom.gui.customBlsGui.createCustomLedGui()
+	]
+	switchTo waitForModelChanged
+	
+	Plan waitForModelChanged []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> outputingData
+	finally
+		repeatPlan
+		
+	Plan outputingData resumeLastPlan [
+		[ !? ledName(NAME) ]
+			onEvent modelChanged : modelChanged(resource(name(NAME), state(on))) -> 
+				javaRun it.unibo.custom.gui.customBlsGui.setLed("on");
+		
+		[ !? ledName(NAME) ]
+			onEvent modelChanged : modelChanged(resource(name(NAME), state(off))) -> 
+				javaRun it.unibo.custom.gui.customBlsGui.setLed("off")
+	]
+	
+}
