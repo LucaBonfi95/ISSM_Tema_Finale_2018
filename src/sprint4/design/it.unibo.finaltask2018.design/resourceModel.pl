@@ -20,7 +20,10 @@ resource(name(robot), state(movement(stopped), obstacleDetected(false))).
  */
  
 resource(name(temp), state(temperature(0))). 
-resource(name(timer), state(currentTime(hours(0), minutes(0), seconds(0)))).
+resource(name(timer), state(currentTime(0))).
+/*
+ * currentTime is in seconds from midnight
+ */
 
 resource(name(led), state(off)).
 
@@ -50,8 +53,8 @@ changeModelItem(NAME, turnLed(VALUE)) :-
 changeModelItem(temp, updateTemperature(VALUE)) :-
  		commonChangeModelItem(name(temp), state(temperature(VALUE))).
 		
-changeModelItem(timer, updateTime(currentTime(hours(HOURS), minutes(MINUTES), seconds(SECONDS)))) :-
- 		commonChangeModelItem(name(timer), state(currentTime(hours(HOURS), minutes(MINUTES), seconds(SECONDS)))).
+changeModelItem(timer, updateTime(currentTime(NOW))) :-
+ 		commonChangeModelItem(name(timer), state(currentTime(NOW))).
 		
 changeModelItem(temperatureIsOk, STATE) :- 		
 		commonChangeModelItem(name(temperatureIsOk), state(STATE)).

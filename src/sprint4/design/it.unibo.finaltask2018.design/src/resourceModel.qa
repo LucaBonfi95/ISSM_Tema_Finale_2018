@@ -8,8 +8,45 @@ Event timeIsOk	: timeIsOk(STATE)
 
 Event modelChanged 		: modelChanged(resource(NAME, STATE))
 
+// Emitted when A robot senses an obstacle (it can be the pfrs robot, the physical robot...)
+// VALUE is always true
+Event obstacleDetected : obstacleDetected(VALUE)
 
+// Emitted when A sonar senses something (unique sonars present are in pfrs environment)
+// VALUE is always true
+// DVALUE is the value of the distance of the object sensed
+Event sonarDetected : sonarDetected(name(NAME), somethingDetected(VALUE), distance(DVALUE))
+
+// Emitted when someone/thing modify the movement state of the robot
+// VALUE can be:
+// - stopped
+// - movingForward
+// - movingBackward
+// - turningLeft
+// - turningRight
+Event robotMovement : robotMovement(VALUE)
+
+// Like the Event. Used to turn the model-controller into an event-driven component
+Dispatch msg_obstacleDetected : obstacleDetected(VALUE)
+
+// Like the Event. Used to turn the model-controller into an event-driven component
+Dispatch msg_robotMovement : robotMovement(VALUE)
+
+
+
+// se si usa con il robot fisico al posto di localhost bisogna mettere l'indirizzo del pc
 Context ctxResourceModel ip[host="localhost" port=8099]
+
+
+// Mappers from Event to Dispatch. Used to turn the model into an event-driven component
+EventHandler evt_obstacle for obstacleDetected {//-pubsub {
+	forwardEvent resource_model_robot -m msg_obstacleDetected
+};
+EventHandler evt_robot for robotMovement {//-pubsub {
+	forwardEvent resource_model_robot -m msg_robotMovement
+};
+
+EventHandler logger for modelChanged -print;
 
 QActor resource_model_led context ctxResourceModel {
 	
@@ -34,11 +71,21 @@ QActor resource_model_led context ctxResourceModel {
 
 QActor resource_model_time context ctxResourceModel {
 	
+	//25200 è 3600 * 7
+	//36000 è 3600 * 10
 	Rules {
-		minTime(hours(0), minutes(0), seconds(0)).
-		maxTime(hours(0), minutes(0), seconds(0)).
+		minTime(25200).
+		maxTime(36000).
 		
-		
+		changedModelAction(resource(name(timer), state(currentTime(VALUE)))) :-
+ 			minTime(MIN),
+ 			maxTime(MAX),
+ 			eval(ge, VALUE, MIN),
+ 			eval(ge, MAX, VALUE), !,
+ 			changeModelItem(timeIsOk, true).
+ 		
+ 		changedModelAction(resource(name(timer), state(currentTime(VALUE)))) :-
+ 			changeModelItem(timeIsOk, false).
 	}
 	
 	Plan init normal [
@@ -63,7 +110,7 @@ QActor resource_model_time context ctxResourceModel {
 QActor resource_model_temperature context ctxResourceModel {
 	
 	Rules {
-		limitTemperatureValue( 25 ).
+		limitTemperatureValue(25).
 		
 		changedModelAction(resource(name(temp), state(temperature(VALUE)))) :-
 				limitTemperatureValue(MAX),
@@ -94,24 +141,57 @@ QActor resource_model_temperature context ctxResourceModel {
 
 
 
-
-
-QActor time_ok context ctxResourceModel {
+QActor resource_model_robot context ctxResourceModel {//-pubsub {
+	
+	Rules {
+		// It is needed to stop the chain of changedModelAction
+		changedModelAction(resource(name(robot), state(movement(stopped), obstacleDetected(true)))) :-
+			!.
+		// When an obstacle is sensed, stop the robot	
+		changedModelAction(resource(name(robot), state(X, obstacleDetected(true)))) :-
+			changeModelItem(robot, movement(stopped)).
+	}
 	
 	Plan init normal [
-		println("resource_model STARTED");
+		println("resource_model_robot STARTS");
+		demo consult("resourceModel.pl")
+	]
+	switchTo waitMsgs
+	
+	Plan waitMsgs []
+	transition
+		stopAfter 1000000
+		whenMsg msg_obstacleDetected -> handleObstacle,
+		whenMsg msg_robotMovement -> handleRobot
+	finally repeatPlan
+		
+	Plan handleObstacle resumeLastPlan [
+		onMsg msg_obstacleDetected : obstacleDetected(VALUE) -> 
+			demo changeModelItem(robot, obstacleDetected(VALUE))			
+	]
+	
+	Plan handleRobot resumeLastPlan [
+		onMsg msg_robotMovement : robotMovement(VALUE) -> 
+			demo changeModelItem(robot, movement(VALUE))
+	]
+}
+
+
+QActor resource_model_sonar context ctxResourceModel {
+	Plan init normal [
+		println("resource_model_sonar STARTS");
 		demo consult("resourceModel.pl")
 	]
 	switchTo waitForInputs
 	
 	Plan waitForInputs []
 	transition
-		stopAfter 1000000
-		whenEvent temperatureIsOk -> changeTimeOk
+		stopAfter 6000000
+		whenEvent sonarDetected -> handleSonar
 	finally repeatPlan
 	
-	Plan changeTimeOk resumeLastPlan [
-		onEvent timeIsOk : timeIsOk(STATE) ->
-			demo changeModelItem(timeIsOk, STATE)
+	Plan handleSonar resumeLastPlan [
+		onEvent sonarDetected : sonarDetected(name(NAME), somethingDetected(VALUE), distance(DVALUE)) ->
+			demo changeModelItem(NAME, state(somethingDetected(VALUE), distance(DVALUE)))	
 	]
-}
+} 
