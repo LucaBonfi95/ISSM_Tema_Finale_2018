@@ -20,7 +20,7 @@ resource(name(robot), state(movement(stopped), obstacleDetected(false))).
  */
  
 resource(name(temp), state(temperature(0))). 
-resource(name(timer), state(currentTime(0))).
+resource(name(timer), state(currentTime(0, 0, 0))).
 /*
  * currentTime is in seconds from midnight
  */
@@ -53,8 +53,8 @@ changeModelItem(NAME, turnLed(VALUE)) :-
 changeModelItem(temp, updateTemperature(VALUE)) :-
  		commonChangeModelItem(name(temp), state(temperature(VALUE))).
 		
-changeModelItem(timer, updateTime(currentTime(NOW))) :-
- 		commonChangeModelItem(name(timer), state(currentTime(NOW))).
+changeModelItem(timer, updateTime(currentTime(H, M, S))) :-
+ 		commonChangeModelItem(name(timer), state(currentTime(H, M, S))).
 		
 changeModelItem(temperatureIsOk, STATE) :- 		
 		commonChangeModelItem(name(temperatureIsOk), state(STATE)).
@@ -86,6 +86,14 @@ emitevent( EVID, EVCONTENT ) :-
 	actorobj( Actor ), 
 	Actor <- emit( EVID, EVCONTENT ).
 
+
+mul(RES, A, B) :- RES is A * B.
+
+sec_tot(SEC_TOT, HOURS, MINS, SECS) :- 
+	S1 is HOURS * 3600,
+	S2 is MINS * 60,
+	S3 is S1 + S2,
+	SEC_TOT is S3 + SECS.
 
 %%%  initialize
 initResourceTheory :- output("initializing the initResourceTheory ...").
