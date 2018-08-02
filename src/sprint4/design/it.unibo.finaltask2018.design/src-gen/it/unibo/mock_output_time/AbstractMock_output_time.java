@@ -140,19 +140,6 @@ public abstract class AbstractMock_output_time extends QActor implements IActivi
 	    				    		  	Term.createTerm(currentEvent.getMsg()), parg);
 	    			if( parg != null ) println( parg );
 	    	}
-	    	//onEvent 
-	    	setCurrentMsgFromStore(); 
-	    	curT = Term.createTerm("modelChanged(resource(name(timer),state(currentTime(H,M,S))))");
-	    	if( currentEvent != null && currentEvent.getEventId().equals("modelChanged") && 
-	    		pengine.unify(curT, Term.createTerm("modelChanged(resource(NAME,STATE))")) && 
-	    		pengine.unify(curT, Term.createTerm( currentEvent.getMsg() ) )){ 
-	    			String parg = "sec_tot(P,H,M,S)";
-	    			/* Print */
-	    			parg =  updateVars( Term.createTerm("modelChanged(resource(NAME,STATE))"), 
-	    			                    Term.createTerm("modelChanged(resource(name(timer),state(currentTime(H,M,S))))"), 
-	    				    		  	Term.createTerm(currentEvent.getMsg()), parg);
-	    			if( parg != null ) println( parg );
-	    	}
 	    	repeatPlanNoTransition(pr,myselfName,"mock_output_time_"+myselfName,false,true);
 	    }catch(Exception e_handleModelChanged){  
 	    	 println( getName() + " plan=handleModelChanged WARNING:" + e_handleModelChanged.getMessage() );

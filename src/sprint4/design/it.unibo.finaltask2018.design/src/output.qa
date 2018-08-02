@@ -1,6 +1,7 @@
 System robot
 
 Event modelChanged : modelChanged(resource(NAME, STATE))
+Event timeCheck : timeCheck(SEC_TOT, HOURS, MINS, SECS)
 
 // Dispatch used to turn the pfrs robot into an event-driven component
 Dispatch msg_modelChanged : modelChanged(resource(NAME, STATE))
@@ -94,9 +95,7 @@ QActor mock_output_time context ctxOutput -g yellow {
 	
 	Plan handleModelChanged resumeLastPlan [
 		onEvent modelChanged : modelChanged(resource(name(timer), state(currentTime(H, M, S)))) ->
-			println(now(H, M, S));
-		onEvent modelChanged : modelChanged(resource(name(timer), state(currentTime(H, M, S)))) ->
-			println(sec_tot(P, H, M, S))
+			println(now(H, M, S))
 	]
 	
 }

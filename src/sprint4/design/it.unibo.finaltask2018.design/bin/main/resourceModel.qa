@@ -73,7 +73,7 @@ QActor resource_model_time context ctxResourceModel {
 	
 	Rules {
 		minTime(7, 0, 0).
-		maxTime(18, 0, 0).
+		maxTime(9, 41, 0).
 		
 		changedModelAction(resource(name(timer), state(currentTime(CUR_H, CUR_M, CUR_S)))) :-
  			minTime(MIN_H, MIN_M, MIN_S),
@@ -86,7 +86,7 @@ QActor resource_model_time context ctxResourceModel {
  			!,
  			changeModelItem(timeIsOk, true).
  		 
- 		changedModelAction(resource(name(timer), state(currentTime(VALUE)))) :-
+ 		changedModelAction(resource(name(timer), state(currentTime(CUR_H, CUR_M, CUR_S)))) :-
  			changeModelItem(timeIsOk, false).
 	}
 	
