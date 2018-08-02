@@ -66,7 +66,7 @@
 \newcommand{\action}[1]{\texttt{#1}\xspace}
 \newcommand{\codescript}[1]{{\scriptsize{\texttt{#1}}}\xspace}
 \newcommand{\code}[1]{{\color{blue}\small{\texttt{#1}}}}
-\newcommand{\fname}[1]{\small{\color{magenta}\texttt{#1}}}
+\newcommand{\fname}[1]{{\color{magenta}\small{\texttt{#1}}}}
 \newcommand{\node}{\textsf{NodeJs}}
 \newcommand{\qa}{\textsf{\textit{QActor}}}
 
@@ -171,96 +171,109 @@
 
 %\sloppy
 
-%===========================================================================
-%\section{Introduction}
+%=========================================================================
+
 \section{Introduzione}
 \labelsec{intro}
+L'ingegneria diversifica le fasi di produzione del software delineando un flusso di lavoro (\textbf{workflow}) costituito da un insieme di passi: 
+definizione dei requisiti, analisi dei requisiti, analisi del problema, progettazione della soluzione, implementazione della soluzione e collaudo. \\
+La progettazione del software può seguire due approcci:
+\begin{itemize}
+	\item \textbf{Approccio top-down}: si considera l'intero sistema software come un'unica entità e lo si scompone per ottenere più di un sotto-sistema o componente. Ogni sotto-sistema o componente viene considerato come un sistema e ulteriormente decomposto;
+	\item \textbf{Approccio bottom-up}: si compongono componenti di più alto livello utilizzando componenti base o di più basso livello. Si continua a creare componenti di più alto livello finché il sistema desiderato non si evolve come un singolo componente.
+\end{itemize}
 
-%===========================================================================
-%
-%===========================================================================
+I problemi possono essere affrontati utilizzando due differenti approcci:
+\begin{itemize}
+	\item \textbf{Approccio olistico}: un sistema viene visto come un insieme che va oltre i sotto-sistemi o i componenti di cui è costituito;
+	\item \textbf{Approccio riduzionistico}: non può essere sviluppato nessun sistema a meno che non si conoscano informazioni su di esso e sui componenti di cui si compone. 
+\end{itemize}
+
+Occorre chiedersi se sia meglio tentare di risolvere un problema partendo dalle ipotesi tecnologiche (come possono essere ad esempio gli oggetti Java) o piuttosto seguire un approccio in cui l'analisi del problema precede la scelta della tecnologia più appropriata. 
+Dopo aver completato l'analisi del problema è possibile imbattersi in un cosiddetto \textbf{abstraction gap}, che evidenzia un gap tra le tecnologie disponibili ed il problema che si deve risolvere. 
+%=========================================================================
+
 \section{Vision}
 \labelsec{vision}
 
-%===========================================================================
-% 
-%===========================================================================
-%\section{Requirements}
+L'obiettivo dell'analisi dei requisiti è capire cosa voglia il committente al fine di produrre, al termine dell'analisi, uno o più modelli nel modo più formale e pratico possibile. \\
+Lo scopo principale della fase di analisi del problema è quello di capire il problema posto dai requisiti, le problematiche riguardanti il problema e i vincoli imposti dal problema o dal contesto. Il risultato dell'analisi del problema è l'architettura logica richiesta dal problema stesso. \\
+All'inizio del processo di sviluppo del software non si considera nessuna ipotesi tecnologica (come ad esempio il paradigma di programmazione ad oggetti o il paradigma di programmazione funzionale).
+%=========================================================================
+
 \section{Requisiti}
 \labelsec{Requirements}
-Nella casa di una determinata città (per esempio Bologna), viene usato un \action{ddr} robot per pulire il pavimento di una stanza (\code{R-FloorClean}).
-Il pavimento della stanza è piatto ed è costituito di un materiale solido; è inoltre equipaggiato con due \textit{sonar}, chiamati \code{sonar1} e \code{sonar2}, come mostrato in Figura \ref{fig:virtualrobot} (\code{sonar1} è quello mostrato in alto). La posizione iniziale (\code{start-point}) del robot è riconosciuta da \code{sonar1}, mentre la posizione finale (\code{end-point}) dal \code{sonar2}.
+Nella casa di una determinata città (per esempio Bologna), viene usato un \action{ddr} robot per pulire il pavimento di una stanza (\code{R-FloorClean}). \newline \indent 
+Il pavimento della stanza è un pavimento piatto di materiale solido ed è equipaggiato con due \textit{sonars}, chiamati \code{sonar1} e \code{sonar2}, come mostrato in Figura \ref{fig:virtualrobot} (\code{sonar1} è quello in alto). La posizione iniziale (\code{start-point}) del robot è rilevata da \code{sonar1}, mentre la posizione finale (\code{end-point}) da \code{sonar2}.
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.7]{img/virtualRobot.jpg}
+	\caption{Esempio di pavimento con il robot in ambiente simulato}
+	\label{fig:virtualrobot}
+\end{figure}
 
 Il robot lavora secondo le seguenti condizioni:
 \begin{enumerate}
-\item \code{R-Start}: un utente autorizzato (\code{authorized user}) ha inviato un comando \action{START} usando una interfaccia \action{GUI} (\code{console}) in esecuzione su un normale \action{PC} oppure su uno smart device (\action{Android}).
-\item \code{R-TempOk}: il valore di temperatura nella città non è superiore ad un limite prefissato (per esempio 25\,$^{\circ}$C).
-\item \code{R-TimeOk}: l'orario corrente è all'interno di un intervallo dato (per esempio fra le 7 e le 10).
+\item \code{R-Start}: un utente autorizzato (\code{authorized user}) ha inviato un comando \action{START} usando un'interfaccia \action{GUI} umana (\code{console}) in esecuzione su un normale \action{PC} oppure su uno smart device (\action{Android}).
+\item \code{R-TempOk}: il valore di temperatura della città non è superiore ad un valore prefissato (per esempio 25\,$^{\circ}$ Celsius).
+\item \code{R-TimeOk}: l'orario corrente è all'interno di un intervallo dato (per esempio fra le 7 e le 10 di mattina).
 \end{enumerate}
 
 Mentre il robot è in movimento:
 \begin{itemize}
-\item se il robot è \fname{real}, un \action{Led} posto su di esso deve lampeggiare (\code{R-BlinkLed});
-\item se il robot è \fname{virtual}, una \action{Led Hue Lamp} disponibile nella casa deve lampeggiare (\code{R-BlinkHue});
+\item un \action{Led} posto su di esso deve lampeggiare, se il robot è un \fname{real} robot (\code{R-BlinkLed});
+\item una \action{Led Hue Lamp} disponibile nella casa deve lampeggiare, se il robot è un \fname{virtual} robot (\code{R-BlinkHue});
 \item deve evitare gli ostacoli fissi (per esempio i mobili) presenti nella stanza (\code{R-AvoidFix}) e/o gli ostacoli mobili come palloni, gatti, ecc. (\code{R-AvoidMobile}).
 \end{itemize}
 
-Inoltre il robot deve interrompere la sua attività quando è verificata una delle seguenti condizioni:
+Inoltre il robot deve interrompere la sua attività quando si verifica una delle seguenti condizioni:
 \begin{enumerate}
-\item \code{R-Stop}: un utente autorizzato ha inviato il comando di \action{STOP} utilizzando la \code{console}.
+\item \code{R-Stop}: un utente autorizzato (\code{authorized user}) ha inviato il comando di \action{STOP} utilizzando la \code{console}.
 \item \code{R-TempKo}: il valore di temperatura della città diventa più alto del valore prefissato.
-\item \code{R-TimeKo}: l'orario corrente non è più all'interno dell'intervallo prefissato.
-\item \code{R-Obstacle}: il robot ha trovato un ostacolo che non è in grado di superare.
+\item \code{R-TimeKo}: l'orario corrente non è più all'interno dell'intervallo dato.
+\item \code{R-Obstacle}: il robot ha trovato un ostacolo che non è in grado di evitare.
 \item \code{R-End}: il robot ha finito il suo lavoro.
 \end{enumerate}
 
-Durante il suo funzionamento il robot può:
+Durante il suo funzionamento il robot può opzionalmente:
 \begin{itemize}
-\item \code{R-Map}: costruire una mappa del pavimento della stanza con la posizione degli ostacoli fissi. Una volta ottenuta, la mappa può essere utilizzata per definire un percorso (ottimo) dallo \code{start-point} all'\code{end-point}.
+\item \code{R-Map}: costruire una mappa del pavimento della stanza con la posizione degli ostacoli fissi. Una volta ottenuta, la mappa può essere utilizzata per definire un piano per un percorso (ottimo) dallo \code{start-point} all'\code{end-point}.
 \end{itemize}
 
-\begin{figure}
-\centering
-\includegraphics[scale=0.7]{img/virtualRobot.jpg}
-\caption{Esempio di pavimento con il robot in ambiente simulato}
-\label{fig:virtualrobot}
-\end{figure}
+%=========================================================================
 
-%===========================================================================
-%
-%===========================================================================
-%\section{Requirement analysis}
 \section{Analisi dei requisiti}
 \labelsec{ReqAnalysis}
-Il sistema da modellare sarà, come esplicitato dai requisiti, eterogeneo e distribuito, in particolare composto da almeno due nodi: il nodo "Robot" e il nodo "PC / Android". 
+Il sistema da modellare sarà, come esplicitato dai requisiti, eterogeneo e distribuito, in particolare composto da almeno due nodi: il nodo "Robot" e il nodo "PC/Android". \\
 Per la modellazione si utilizza il linguaggio \qa\ in quanto adatto alla modellazione di sistemi distribuiti.
 
-Prima di formalizzare il contenuto del diagramma di  \ref{fig:reqAnalysis}, ci soffermiamo sul significato di ciascun elemento. 
+Il diagramma informale risultato dall'analisi dei requisiti è riportato in figura \ref{fig:reqAnalysis}.
 
-Il primo dei due nodi che abbiamo modellato è il nodo "PC / Android" che si occupa di mostrare la \action{GUI} e interagire direttamente con un utente umano, richiedendone l'autenticazione. Come da requisito \code{R-Start} l'interfaccia utente deve poter essere utilizzabile sia su \action{PC} che su un dispositivo \action{Android}, tuttavia, essendo le funzioni che essa deve svolgere identiche in entrambi i casi, abbiamo rappresentato entrambi i nodi come uno unico. Su questo nodo esegue l'attore "GUI/Authenticator", che consente all'utente di autenticarsi e inviare i comandi di \action{START} e \action{STOP} al robot (\code{R-Start} e \code{R-Stop}). 
+Il primo dei due nodi che si è modellati è il nodo "PC/Android" che si occupa di mostrare la \action{GUI} e di interagire direttamente con un utente umano, richiedendone l'autenticazione. Come da requisito \code{R-Start} l'interfaccia utente deve poter essere utilizzabile sia su \action{PC} che su un dispositivo \action{Android}. Tuttavia, essendo le funzioni che essa deve svolgere identiche in entrambi i casi, si sono rappresentati entrambi i nodi come un unico nodo. Su questo nodo esegue l'attore "GUI/Authenticator", che consente all'utente di autenticarsi e inviare i comandi di \action{START} e \action{STOP} al robot (\code{R-Start} e \code{R-Stop}). 
 
-Il secondo nodo "Raspberry / PC" controlla il robot, esso può essere in esecuzione su un PC, nel caso del robot virtuale, oppure su un Raspberry Pi nel caso del robot reale. L'attore "Robot" si pone in attesa dei comandi inviati da "GUI/Authenticator" e riceve informazioni sull'ambiente esterno da un sensore di temperatura e un timer (\code{R-TempOk}, \code{R-TimeOk}, \code{R-TempKo}, \code{R-TimeKo}). Durante l'esecuzione, in caso di movimento, l'attore "Robot" invia a "Led" e a "Hue Lamp" comandi per l'accensione e lo spegnimento (\code{R-BlinkLed}, \code{R-BlinkHue}). 
+Il secondo nodo che si è modellato è il nodo "Raspberry/PC", responsabile del controllo del robot. Esso può essere in esecuzione su un PC, nel caso del \fname{virtual} robot, oppure su un Raspberry Pi nel caso del \fname{real} robot. \\ L'attore "Robot" si pone in attesa dei comandi inviati da "GUI/Authenticator" e riceve informazioni sull'ambiente esterno da un sensore di temperatura e da un timer (\code{R-TempOk}, \code{R-TimeOk}, \code{R-TempKo}, \code{R-TimeKo}). Durante l'esecuzione, se il robot è in movimento, l'attore "Robot" invia a "Led" e a "Hue Lamp" i comandi per l'accensione e lo spegnimento necessari a farli lampeggiare (\code{R-BlinkLed}, \code{R-BlinkHue}). 
 
-L'attore "Robot" si occupa inoltre di gestire la logica applicativa, ovvero, in seguito alla ricezione del comando \action{START} da parte dell'utente, prendere decisioni circa il movimento del robot all'interno della stanza – per il robot reale – e all'interno dell'ambiente simulato – per il robot virtuale -, tentando di evitare gli ostacoli fissi e mobili (\code{R-AvoidFix}, \code{R-AvoidMobile}), costruendo una mappa (\code{R-Map}) dell'ambiente.
+L'attore "Robot" si occupa inoltre di gestire la logica applicativa, che consiste, in seguito alla ricezione del comando \action{START} da parte dell'utente, nel prendere decisioni circa il movimento del robot all'interno della stanza – per il robot reale – e all'interno dell'ambiente simulato – per il robot virtuale – tentando di evitare gli ostacoli fissi e mobili (\code{R-AvoidFix}, \code{R-AvoidMobile}) e costruendo una mappa (\code{R-Map}) dell'ambiente.
 
-Se l'attore "Robot" trova un ostacolo che non riesce ad evitare si deve fermare (\code{R-Obstacle}).
+Inoltre, se l'attore "Robot" trova un ostacolo che non riesce ad evitare si deve fermare (\code{R-Obstacle}).
 Questa situazione si verifica quando il robot trova uno o più ostacoli che gli impediscono di avanzare in una direzione diversa da quella da cui è arrivato.
 
-\begin{figure}
+\begin{figure}[h]
 \centering
 \includegraphics[scale=0.4]{img/requirements_analysis.png}
 \caption{Analisi dei requisiti informale}
 \label{fig:reqAnalysis}
 \end{figure}
 
+Vengono di seguito riportati i modelli formali risultati dall'analisi dei requisiti:
+
 \lstinputlisting[label={lst:reqAnalysisRobot}]{code/reqAnalysisRobot.qa}
 \lstinputlisting[label={lst:reqAnalysisUser}]{code/reqAnalysisUser.qa}
 
 
-%===========================================================================
-%
-%===========================================================================
-%\section{Problem analysis}
+%=========================================================================
+
 \section{Analisi del problema}
 \labelsec{ProblemAnalysis}
 Il primo problema che sorge è quello di stabilire quale nodo si occuperà di autenticare l'utente. Una possibilità è che sia sul nodo del robot: in questo caso il robot potrebbe non disporre delle adeguate risorse computazionali per gestire il processo di autenticazione, tuttavia questo garantirebbe maggiore sicurezza. Un'altra possibilità è che l'autenticazione sia su un nodo diverso rispetto a quello del robot: ciò consente di non utilizzare le risorse computazionali del robot richiedendo però maggiori accortezze sulla sicurezza. In quest'ultimo caso l'autenticazione potrebbe essere gestita dal nodo dell'utente oppure da un nodo distinto, il quale comporterebbe costi maggiori.
@@ -273,33 +286,29 @@ La comunicazione tra utente e robot tramite \action{GUI} può avvenire via messa
 \lstinputlisting[label={lst:probAnalysisRobot}]{code/probAnalysisRobot.qa}
 \lstinputlisting[label={lst:probAnalysisUser}]{code/probAnalysisUser.qa}
 
-%===========================================================================
-%
-%===========================================================================
-%\section{Project}
+%=========================================================================
+
 \section{Progettazione}
 \labelsec{Project}
-%===========================================================================
-%
-%===========================================================================
-%\section{Implementation}
+%=========================================================================
+
 \section{Implementazione}
 \labelsec{Implementation}
 %===========================================================================
 %
 %===========================================================================
 %\section{Testing}
-\labelsec{Testing}
+%\labelsec{Testing}
 %===========================================================================
 %
 %===========================================================================
 %\section{Maintenance}
-\labelsec{Maintenance}
+%\labelsec{Maintenance}
 %===========================================================================
 %
 %===========================================================================
 %\section{Deployment}
-\labelsec{Deployment}
+%\labelsec{Deployment}
 %
 %===========================================================================
 \newpage
