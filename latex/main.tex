@@ -196,8 +196,12 @@ Dopo aver completato l'analisi del problema è possibile imbattersi in un cosidd
 \section{Vision}
 \labelsec{vision}
 
-L'obiettivo dell'analisi dei requisiti è capire cosa voglia il committente al fine di produrre, al termine dell'analisi, uno o più modelli nel modo più formale e pratico possibile. \\
-Lo scopo principale della fase di analisi del problema è quello di capire il problema posto dai requisiti, le problematiche riguardanti il problema e i vincoli imposti dal problema o dal contesto. Il risultato dell'analisi del problema è l'architettura logica richiesta dal problema stesso. \\
+La visione adottata è quella per cui non si possa cominciare a scrivere codice prima di aver completato la fase di progettazione, che a sua volta deve seguire la fase di analisi del problema, preceduta da quella di analisi dei requisiti.  \\
+Si utilizza una metodologia top-down che consiste nell'aggredire il problema posto dai requisiti ad un livello generale, lasciando in ultima istanza il trattamento dei dettagli, ben distinguendo la fase di analisi, strategica nel processo di sviluppo del software, da quella di progettazione. \\ \indent 
+L'obiettivo dell'analisi dei requisiti è quello di capire cosa voglia il committente, al fine di produrre, al termine dell'analisi, uno o più modelli delle entità descritte dai requisiti, nel modo più formale e pratico possibile, catturandone gli aspetti essenziali in termini di struttura, interazione e comportamento. \\ \indent 
+Lo scopo della fase di analisi del problema è quello di capire il problema posto dai requisiti, le problematiche riguardanti il problema e i vincoli imposti dal problema o dal contesto. L'analisi non ha come obiettivo la descrizione delle proprietà strutturali e comportamentali del sistema che risolverà il problema, in quanto questo è l'obiettivo della progettazione. Il risultato dell'analisi del problema è l'architettura logica implicata dai requisiti e dalle problematiche individuate. \\ \indent 
+L'obiettivo della fase di progettazione è quello di raffinare l'architettura logica del sistema, considerando tutti gli aspetti vincolanti che si sono trascurati nelle fasi precedenti, per arrivare a delineare e descrivere non solo la soluzione al problema ma anche e soprattutto i motivi che hanno condotto a questa soluzione. 
+L'architettura del sistema scaturita dalla progettazione dovrebbe essere il più possibile indipendente dalle tecnologie realizzative. La progettazione dovrebbe procedere procedere dal generale al particolare, sviluppando per primi i sottosistemi più critici individuati dall'analisi. \\ \indent 
 All'inizio del processo di sviluppo del software non si considera nessuna ipotesi tecnologica (come ad esempio il paradigma di programmazione ad oggetti o il paradigma di programmazione funzionale).
 %=========================================================================
 
@@ -246,31 +250,57 @@ Durante il suo funzionamento il robot può opzionalmente:
 \section{Analisi dei requisiti}
 \labelsec{ReqAnalysis}
 Il sistema da modellare sarà, come esplicitato dai requisiti, eterogeneo e distribuito, in particolare composto da almeno due nodi: il nodo "Robot" e il nodo "PC/Android". \\
-Per la modellazione si utilizza il linguaggio \qa\ in quanto adatto alla modellazione di sistemi distribuiti.
+Per la modellazione si utilizza il linguaggio \qa\ in quanto adatto alla modellazione di sistemi distribuiti. 
 
-Il diagramma informale risultato dall'analisi dei requisiti è riportato in figura \ref{fig:reqAnalysis}.
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.4]{img/requirements_analysis.png}
+	\caption{Diagramma informale dell'analisi dei requisiti}
+	\label{fig:reqAnalysis}
+\end{figure}
 
 Il primo dei due nodi che si è modellati è il nodo "PC/Android" che si occupa di mostrare la \action{GUI} e di interagire direttamente con un utente umano, richiedendone l'autenticazione. Come da requisito \code{R-Start} l'interfaccia utente deve poter essere utilizzabile sia su \action{PC} che su un dispositivo \action{Android}. Tuttavia, essendo le funzioni che essa deve svolgere identiche in entrambi i casi, si sono rappresentati entrambi i nodi come un unico nodo. Su questo nodo esegue l'attore "GUI/Authenticator", che consente all'utente di autenticarsi e inviare i comandi di \action{START} e \action{STOP} al robot (\code{R-Start} e \code{R-Stop}). 
 
-Il secondo nodo che si è modellato è il nodo "Raspberry/PC", responsabile del controllo del robot. Esso può essere in esecuzione su un PC, nel caso del \fname{virtual} robot, oppure su un Raspberry Pi nel caso del \fname{real} robot. \\ L'attore "Robot" si pone in attesa dei comandi inviati da "GUI/Authenticator" e riceve informazioni sull'ambiente esterno da un sensore di temperatura e da un timer (\code{R-TempOk}, \code{R-TimeOk}, \code{R-TempKo}, \code{R-TimeKo}). Durante l'esecuzione, se il robot è in movimento, l'attore "Robot" invia a "Led" e a "Hue Lamp" i comandi per l'accensione e lo spegnimento necessari a farli lampeggiare (\code{R-BlinkLed}, \code{R-BlinkHue}). 
+Il secondo nodo che si è modellato è il nodo "Raspberry/PC", responsabile del controllo del robot. Esso può essere in esecuzione su un PC, nel caso del \fname{virtual} robot, oppure su un Raspberry Pi nel caso del \fname{real} robot. \\ L'attore "Robot" si pone in attesa dei comandi inviati da "GUI/Authenticator" ed è in grado di ricevere informazioni relative alle condizioni di temperatura ed al tempo (\code{R-TempOk}, \code{R-TimeOk}, \code{R-TempKo}, \code{R-TimeKo}). Durante l'esecuzione, se il robot è in movimento, l'attore "Robot" invia a "Led" e a "Hue Lamp" i comandi per l'accensione e lo spegnimento necessari a farli lampeggiare (\code{R-BlinkLed}, \code{R-BlinkHue}). 
 
-L'attore "Robot" si occupa inoltre di gestire la logica applicativa, che consiste, in seguito alla ricezione del comando \action{START} da parte dell'utente, nel prendere decisioni circa il movimento del robot all'interno della stanza – per il robot reale – e all'interno dell'ambiente simulato – per il robot virtuale – tentando di evitare gli ostacoli fissi e mobili (\code{R-AvoidFix}, \code{R-AvoidMobile}) e costruendo una mappa (\code{R-Map}) dell'ambiente.
+L'attore "Robot" si occupa inoltre di gestire la logica applicativa, che consiste, in seguito alla ricezione del comando \action{START} da parte dell'utente, nel prendere decisioni circa il movimento del robot all'interno della stanza – per il robot reale – e all'interno dell'ambiente simulato – per il robot virtuale – tentando di evitare gli ostacoli fissi e mobili (\code{R-AvoidFix}, \code{R-AvoidMobile}), costruendo una mappa del pavimento (\code{R-Map}) e interrompendone l'attività una volta completato il proprio lavoro (\code{R-End}).
 
 Inoltre, se l'attore "Robot" trova un ostacolo che non riesce ad evitare si deve fermare (\code{R-Obstacle}).
-Questa situazione si verifica quando il robot trova uno o più ostacoli che gli impediscono di avanzare in una direzione diversa da quella da cui è arrivato.
-
-\begin{figure}[h]
-\centering
-\includegraphics[scale=0.4]{img/requirements_analysis.png}
-\caption{Analisi dei requisiti informale}
-\label{fig:reqAnalysis}
-\end{figure}
+Questa situazione si verifica quando il robot trova uno o più ostacoli che gli impediscono di raggiungere il secondo sonar.
 
 Vengono di seguito riportati i modelli formali risultati dall'analisi dei requisiti:
 
-\lstinputlisting[label={lst:reqAnalysisRobot}]{code/reqAnalysisRobot.qa}
-\lstinputlisting[label={lst:reqAnalysisUser}]{code/reqAnalysisUser.qa}
+\lstinputlisting[label={lst:reqAnalysisRobot}]{../src/sprint4/req_analysis/reqAnalysisRobot.qa}
+\lstinputlisting[label={lst:reqAnalysisUser}]{../src/sprint4/req_analysis/reqAnalysisUser.qa}
 
+Prima di descrivere più dettagliatamente i modelli prodotti durante l'analisi dei requisiti è necessaria una premessa relativa alle modalità di interazione dei componenti del sistema. Trattandosi di un sistema eterogeneo distribuito, ed utilizzando il linguaggio di modellazione \action{QActor}, le due modalità con cui i componenti all'interno del sistema possono interagire sono quelle ad eventi e messaggi. 
+
+In questo ambito un messaggio non è altro che un'informazione che il mittente invia ad uno specifico destinatario; al contrario, un evento cattura il concetto di informazione senza specifico destinatario: tutti i componenti del sistema interessati all'evento possono riceverlo. \\
+
+Il sistema \action{systemRobot} è stato modellato come un sistema costituito di due contesti, il contesto stand-alone \action{ctxRobot} ed il contesto \action{ctxUser}. 
+
+All'interno del primo contesto operano i Qactor:
+\begin{itemize}
+	\item \textbf{robot}: si mette in attesa di due eventi: 
+	\begin{itemize}
+		\item \textbf{robotCmd : robotCmd(X)}: evento emesso dall'utente autenticato per comandare il robot (start/stop), alla ricezione del quale viene emesso l'evento \textbf{outCmd : outCmd(X)}, necessario per comandare il funzionamento del led e della lampada Hue;
+		\item \textbf{sensorEvent : sensorEvent(X)}: evento che può essere emesso dai sonar presenti nella stanza o dalle sorgenti dei dati di temperatura e tempo.
+	\end{itemize}
+	 \item \textbf{sonarsensor1}, \textbf{sonarsensor2}, \textbf{temperaturesensor}, \textbf{timersensor}: emettono eventi \textbf{sensorEvent : sensorEvent(X)}, catturati dall'attore \textbf{robot}.
+	 \item \textbf{led}, \textbf{huelamp}: si mettono in attesa 
+	 degli eventi \textbf{outCmd : outCmd(X)}, emessi dall'attore \textbf{robot}. 
+\end{itemize}
+Dall'analisi dei requisiti sono emerse le necessità di interazione tra i sonar ed il robot, tra le sorgenti dei dati di temperatura e tempo ed il robot, nonché tra il robot stesso e i dispositivi attuatori, in questo caso led e lampada hue. \\
+Sarebbe possibile modellare queste interazioni come messaggi: in questo caso sia i sonar che le sorgenti di temperatura e tempo dovrebbero conoscere lo specifico destinatario dei loro messaggi; allo stesso modo il robot dovrebbe conoscere i specifici dispositivi attuatori a cui inviare le informazioni. \\
+Alla luce di ciò risulta più conveniente modellare queste interazioni tramite eventi, che permettono un maggiore disaccoppiamento delle entità in gioco, consentendo eventualmente a più robot distinti di raccogliere i dati in input e a differenti attuatori di ricevere comandi dal robot. \\
+
+All'interno del contesto \action{ctxUser} operano invece gli attori:
+\begin{itemize}
+	\item \textbf{user}: invia messaggi \textbf{userCmd : userCmd(X)} all'attore \textbf{gui};
+	\item \textbf{gui}: riceve i messaggi \textbf{userCmd : userCmd(X)} emettendo eventi \textbf{robotCmd : robotCmd(X)} destinati a comandare il robot.
+\end{itemize}
+In questo caso non si evidenziano particolari differenze nel modellare l'interazione user-gui tramite messaggi piuttosto che tramite eventi. 
+Per quanto riguarda l'interazione gui-robot è più opportuno che essa sia modellata tramite eventi piuttosto che tramite messaggi, in quanto risultano più vantaggiosi per disaccoppiare l'interfaccia grafica dallo specifico robot comandato. 
 
 %=========================================================================
 
@@ -283,14 +313,22 @@ Un altro problema è quello dell'interfaccia \action{GUI}, che deve poter esegui
 La comunicazione tra utente e robot tramite \action{GUI} può avvenire via messaggi o via eventi. La comunicazione ad eventi permette di disaccoppiare \action{GUI} e robot, consentendo di utilizzare un'unica \action{GUI} per comunicare con diversi robot. Utilizzando gli eventi può essere adottato un approccio \code{event-based} o un approccio \code{event-driven}. Nell'approccio \code{event-based} il robot non sarebbe sempre sensibile agli eventi, potendone perdere alcuni. Al contrario, nell'approccio \code{event-driven} il robot sarebbe sempre sensibile agli eventi perdendo tuttavia reattività.
 \\
 
-\lstinputlisting[label={lst:probAnalysisRobot}]{code/probAnalysisRobot.qa}
-\lstinputlisting[label={lst:probAnalysisUser}]{code/probAnalysisUser.qa}
+\lstinputlisting[label={lst:probAnalysisRobot}]{../src/sprint4/prob_analysis/probAnalysisRobot.qa}
+\lstinputlisting[label={lst:probAnalysisUser}]{../src/sprint4/prob_analysis/probAnalysisUser.qa}
 
 %=========================================================================
 
 \section{Progettazione}
 \labelsec{Project}
 %=========================================================================
+
+\lstinputlisting[label={lst:designResourseModel}]{../src/sprint4/design/it.unibo.finaltask2018.design/src/resourceModel.qa}
+\lstinputlisting[label={lst:designAppl}]{../src/sprint4/design/it.unibo.finaltask2018.design/src/applicationLogic.qa}
+\lstinputlisting[label={lst:designOut}]{../src/sprint4/design/it.unibo.finaltask2018.design/src/output.qa}
+\lstinputlisting[label={lst:designIn}]{../src/sprint4/design/it.unibo.finaltask2018.design/src/input.qa}
+\lstinputlisting[label={lst:designIn}]{../src/sprint4/design/it.unibo.finaltask2018.design/src/real_robot_adapter.qa}
+\lstinputlisting[label={lst:designIn}]{../src/sprint4/design/it.unibo.finaltask2018.design/src/real_led_adapter.qa}
+
 
 \section{Implementazione}
 \labelsec{Implementation}
