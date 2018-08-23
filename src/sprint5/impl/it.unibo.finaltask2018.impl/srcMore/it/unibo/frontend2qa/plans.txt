@@ -1,0 +1,4 @@
+plan(1,init, sentence(true,move(print("frontend2qa STARTED")),'','' ))
+plan(1,handleEvent, sentence(true,eventswitch(local_userstart, »userstart( X), raise( userstart , userstart( X) )') ),'','' ))
+plan(2,handleEvent, sentence(true,eventswitch(local_userstop, »userstop( X), raise( userstop , userstop( X) )') ),'','' ))
+plan(3,handleEvent, sentence(true,move(resumeplan),'','' ))

@@ -1,0 +1,91 @@
+// First analysis model. It represent the strucutre and the interaction. NOT the behaviour * 
+System robotSystem
+
+Event input : input(DATA)
+Event modelChanged : modelChanged(DATA)
+
+Context ctxRobotSystem ip[host="localhost" port=8099]
+
+QActor resource_model context ctxRobotSystem {
+	
+	Plan init normal [
+		println("resource_model STARTED");
+		demo consult("resourceModel.pl")
+	]
+	switchTo waitForInputs
+	
+	Plan waitForInputs []
+	transition
+		stopAfter 1000000
+		whenEvent input -> handleInput
+	finally repeatPlan
+	
+	Plan handleInput resumeLastPlan [
+		//change the resourceModel
+		emit modelChanged : modelChanged(changedData)
+	]
+	
+}
+
+
+QActor controller context ctxRobotSystem {
+	
+	Rules {
+		// rules needed by the application logic
+	}
+	
+	Plan init normal [
+		println("controller STARTED")
+	]
+	switchTo waitForModelChanged
+	
+	Plan waitForModelChanged []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> applLogic
+	finally
+		repeatPlan
+		
+	Plan applLogic resumeLastPlan [
+		// according to the appl logic emit the input event to change the resource model
+		onEvent modelChanged : modelChanged(interestedData) -> emit input : input(newData)
+	]
+	
+}
+
+
+QActor input_element context ctxRobotSystem {
+	
+	Plan init normal [
+		println("input_element STARTED")
+	]
+	switchTo working
+	
+	Plan working [
+		// interact with the implementation of the specific input element and emit the data to modify the resourceModel
+		emit input : input(realData)
+	]
+	finally repeatPlan
+	
+}
+
+
+QActor resource_representation_element context ctxRobotSystem {
+
+	Plan init normal [
+		println("resource_representation_element STARTED")
+	]
+	switchTo waitForModelChanged
+	
+	Plan waitForModelChanged []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> outputingData
+	finally
+		repeatPlan
+		
+	Plan outputingData resumeLastPlan [
+		onEvent modelChanged : modelChanged(interestedData) -> javaRun interested.class.method()
+	]
+	
+}

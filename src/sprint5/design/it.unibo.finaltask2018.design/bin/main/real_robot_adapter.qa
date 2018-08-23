@@ -1,0 +1,59 @@
+System robot
+
+// Emitted PROLOG-side when the model is changed
+// It makes the model observable
+Event modelChanged : modelChanged(resource(NAME, STATE))
+
+// Dispatch used to turn the real robot into an event-driven component
+Dispatch msg_modelChanged : modelChanged(resource(NAME, STATE))
+
+ 
+Context ctxRealRobotAdapter ip[host="localhost" port=9010]
+
+// It turns the real robot into an event-driven component
+EventHandler evt_modelchanged for modelChanged {
+	forwardEvent adapter_to_physical_mbot -m msg_modelChanged
+};
+ 
+
+
+QActor adapter_to_physical_mbot context ctxRealRobotAdapter {//-pubsub {
+	
+	Rules {
+		
+	}
+	
+	Plan init normal [
+//		javaRun it.unibo.myArduinoUtils.connArduino.initPc("COM6", "115200");
+		javaRun it.unibo.myArduinoUtils.connArduino.initRasp("115200");
+		println("adapter_to_physical_mbot STARTS")
+	]
+	switchTo waitMsgs
+	
+	Plan waitMsgs []
+	transition
+		stopAfter 1000000
+		whenMsg msg_modelChanged -> moveRobot
+	finally repeatPlan
+	
+	
+	Plan moveRobot resumeLastPlan [
+		onMsg msg_modelChanged : modelChanged(resource(name(robot), state(movement(stopped), X))) ->
+			javaRun it.unibo.myArduinoUtils.connArduino.mbotStop();
+		onMsg msg_modelChanged : modelChanged(resource(name(robot), state(movement(movingForward), obstacleDetected(false)))) ->
+			javaRun it.unibo.myArduinoUtils.connArduino.mbotForward();
+		onMsg msg_modelChanged : modelChanged(resource(name(robot), state(movement(movingBackward), X))) ->
+			javaRun it.unibo.myArduinoUtils.connArduino.mbotBackward();
+		onMsg msg_modelChanged : modelChanged(resource(name(robot), state(movement(turningLeft), X))) -> {
+				javaRun it.unibo.myArduinoUtils.connArduino.mbotLeft();
+				delay 600;	//test needed
+				javaRun it.unibo.myArduinoUtils.connArduino.mbotStop()
+			};
+		onMsg msg_modelChanged : modelChanged(resource(name(robot), state(movement(turningRight), X))) -> {
+				javaRun it.unibo.myArduinoUtils.connArduino.mbotRight();
+				delay 600;	//test needed
+				javaRun it.unibo.myArduinoUtils.connArduino.mbotStop()
+			}
+	]
+	
+}

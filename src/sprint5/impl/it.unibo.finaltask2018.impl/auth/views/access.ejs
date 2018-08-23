@@ -1,0 +1,56 @@
+<% include _headerAccess %>
+
+<h1>Robot Control</h1>
+<center>
+	
+	<div class="container col-md-5">
+		<input type="button" value="START" class="btn btn-success btn-block" onclick="socket.send('msg#local_userstart#userstart(user)')">
+	</div>
+	<div class="container col-md-2"></div>
+	<div class="container col-md-5">
+		<input type="button" value="STOP" class="btn btn-danger btn-block" onclick="socket.send('msg#local_userstop#userstop(user)')">
+	</div>
+		
+</center>
+
+<div class="spacer"></div>
+<h1>System State</h1>
+
+<div class="container col-md-2">
+	<b>Robot</b>
+</div>
+<div class="container col-md-10">
+	The robot is <span id="robot.movement">stopped</span><br/>
+	and is <span id="robot.obstacleDetected">not </span>detecting an obstacle.
+</div><br/>
+	
+<div class="container col-md-2">
+	<b>Led</b>
+</div>
+<div class="container col-md-10">
+	The led is <span id="led.state">off</span>.
+</div><br/>
+
+<div class="container col-md-2">
+	<b>Sonar 1</b>
+</div>
+<div class="container col-md-10">
+	Sonar 1 is <span id="sonar1.somethingDetected">not </span>detecting an object.
+</div><br/>
+
+<div class="container col-md-2">
+	<b>Sonar 2</b>
+</div>
+<div class="container col-md-10">
+	Sonar 2 is <span id="sonar2.somethingDetected">not </span>detecting an object.
+</div><br/>
+
+<div class="container col-md-2">
+	<b>Temperature</b>
+</div>
+<div class="container col-md-10">
+	The temperature is <span id="temp.temperature">0</span> &deg;C.
+</div><br/>
+
+
+<% include _footer %>

@@ -1,0 +1,4 @@
+plan(1,init, sentence(true,not here StateMoveNormal,'','' ))
+plan(2,init, sentence(true,move(print("qa2frontend STARTED")),'','' ))
+plan(1,emitMqttEvent, sentence(true,eventswitch(modelChanged, »modelChanged( RES), not here StateMoveNormal ),'','' ))
+plan(2,emitMqttEvent, sentence(true,move(resumeplan),'','' ))

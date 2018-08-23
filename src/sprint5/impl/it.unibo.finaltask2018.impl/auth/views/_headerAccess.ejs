@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Robot Control</title>
+<link rel="icon" href="favicon.ico">
+<link rel="shortcut icon" href="favicon.ico">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+<style type="text/css">
+	.spacer { margin:0; padding:0; height:50px; }
+</style>
+
+<script src="/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+	var socket = io.connect();
+	socket.on('message', handleMessage);
+	
+	function mapper(name, state) {
+		if(name == "robot.movement")
+			return {
+				"stopped" : "stopped",
+				"turningLeft": "turning left",
+				"turningRight": "turning right",
+				"movingBackward": "moving backward",
+				"movingForward": "moving forward"
+			}[state];
+		if(name == "robot.obstacleDetected" || name.match("sonar+somethingDetected"))
+			return {
+				"true": "",
+				"false": "not "
+			}[state];
+		if(name == "led.state" || name == "temp.temperature")
+			return state;
+	}
+	
+	function handleMessage(m) {
+		var name = m.split("#")[0];
+		var state = m.split("#")[1];
+		document.getElementById(name).innerHTML = mapper(name, state);
+	}
+</script>
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-static-top" role="navigation">
+
+  <div class="container">
+
+
+    <ul class="nav navbar-nav navbar-left">
+      <% if (currentUser) { %>
+        <li>
+          <a href="/edit">
+            Change profile of <%= currentUser.name() %>
+          </a>
+        </li>
+        <li><a href="/access">Drive the robot</a></li>
+      <% } else { %>
+        <li><a href="/login">Log in</a></li>
+        <li><a href="/signup">Sign up</a></li>
+      <% } %>
+    </ul>
+
+  </div>
+
+</div>
+
+<div class="container">
+
+  <% errors.forEach(function(error) { %>
+    <div class="alert alert-danger" role="alert">
+      <%= error %>
+    </div>
+  <% }) %>
+
+  <% infos.forEach(function(info) { %>
+    <div class="alert alert-info" role="alert">
+      <%= info %>
+    </div>
+  <% }) %>

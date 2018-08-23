@@ -1,0 +1,3 @@
+plan(1,init, sentence(true,move(print("Temperature Observer STARTED")),'','' ))
+plan(1,handleModelChanged, sentence(true,eventswitch(modelChanged, »modelChanged( resource( name( temp),state( temperature( VALUE)))), move(print(temp( VALUE))) ),'','' ))
+plan(2,handleModelChanged, sentence(true,move(resumeplan),'','' ))

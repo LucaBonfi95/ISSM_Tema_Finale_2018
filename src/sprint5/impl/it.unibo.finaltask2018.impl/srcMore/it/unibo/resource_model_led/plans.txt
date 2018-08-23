@@ -1,0 +1,4 @@
+plan(1,init, sentence(true,move(print("resource_model STARTED")),'','' ))
+plan(2,init, sentence(true,move(solve,consult( "resourceModel.pl"),0,""),'','' ))
+plan(1,handleTurnLed, sentence(true,eventswitch(turnLed, »turnLed( NAME,STATE), move(solve,changeModelItem( NAME,turnLed( STATE)),0,"") ),'','' ))
+plan(2,handleTurnLed, sentence(true,move(resumeplan),'','' ))

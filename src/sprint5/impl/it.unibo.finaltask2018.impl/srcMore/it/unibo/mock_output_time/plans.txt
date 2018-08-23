@@ -1,0 +1,4 @@
+plan(1,init, sentence(true,move(print("Timer Observer STARTED")),'','' ))
+plan(2,init, sentence(true,move(solve,consult( "resourceModel.pl"),0,""),'','' ))
+plan(1,handleModelChanged, sentence(true,eventswitch(modelChanged, »modelChanged( resource( name( timer),state( currentTime( H,M,S)))), move(print(now( H,M,S))) ),'','' ))
+plan(2,handleModelChanged, sentence(true,move(resumeplan),'','' ))

@@ -1,0 +1,190 @@
+System systemRobot
+
+Event robotCmd : robotCmd(X)
+Event sensorEvent : sensorEvent(X)
+Event outCmd : outCmd(X)
+
+Context ctxProbRobot ip[host="localhost" port=5400] 
+
+QActor robot context ctxProbRobot {  
+	Rules {
+		limitTemperatureValue(25).
+		minTime(7).
+		maxTime(10).
+		currentTempValue(0).
+		currentTimeValue(0).
+		evalTemp:-
+			limitTemperatureValue(MAX), 
+			currentTempValue(VALUE),
+ 		    eval(ge, MAX, VALUE).	
+ 		evalTime:-
+ 			minTime(MIN),
+ 			maxTime(MAX),
+ 			currentTimeValue(VALUE),
+ 			eval(ge, VALUE, MIN),
+ 			eval(ge, MAX, VALUE).
+		startRequirementsOk :- evalTemp, evalTime.
+		map.
+	}
+	
+	Plan initial normal [
+		println("Robot started");
+		delay 2000
+	] 
+	
+	switchTo waitForEvent
+	
+	Plan waitForEvent [
+	]
+	transition stopAfter 600000
+		whenEvent robotCmd -> handleEvent,
+		whenEvent sensorEvent -> handleEvent
+	finally repeatPlan
+		
+	Plan handleEvent resumeLastPlan [
+		onEvent robotCmd : robotCmd(cmdstart) -> { 
+			[ !? startRequirementsOk ] {
+				println("Robot start"); 
+				emit outCmd : outCmd(startblinking);
+				[ !? map ] 
+					println("Il robot segue il percorso ottimo")
+				else 
+					println("Mentre il robot è in azione deve costruire la mappa")
+			}
+		}; 
+		onEvent robotCmd : robotCmd(cmdstop) -> { 
+			println("Robot stop from user"); 
+			emit outCmd : outCmd(stopblinking)	
+		}; 
+		onEvent sensorEvent : sensorEvent(sonar1) -> println("Robot receives event from sonar1");
+		onEvent sensorEvent : sensorEvent(sonar2) -> {
+			emit robotCmd : robotCmd(cmdstop); // il robot ha finito
+			[ !? map ]
+				addRule map // se non c'era una mappa precedente viene creata 
+		};
+		onEvent sensorEvent : sensorEvent(onboardsonar) -> {
+			//the robot stops for a while and then retries
+			println("Robot stop");
+			// se è la prima volta che incontra un ostacolo: 
+			delay 500;
+			println("Il robot prova di nuovo ad andare avanti");
+			// se invece è la seconda volta che incontra lo stesso ostacolo:
+			println("Il robot prova ad andare a destra o a sinistra");
+			// se non si può andare né a destra né a sinistra allora il robot si ferma:
+			emit robotCmd : robotCmd(cmdstop)
+		};
+		onEvent sensorEvent : sensorEvent(temp(VALUE)) -> ReplaceRule currentTempValue(X) with currentTempValue(VALUE);
+		onEvent sensorEvent : sensorEvent(temp(X)) -> {
+			[ not !? evalTemp ] {
+				println("Robot stop from temperature sensor"); 
+				emit outCmd : outCmd(stopblinking)	
+			}
+		};
+		onEvent sensorEvent : sensorEvent(timer(VALUE)) -> ReplaceRule currentTimeValue(X) with currentTimeValue(VALUE);
+		onEvent sensorEvent : sensorEvent(timer(X)) -> {
+			[ not !? evalTime ] {
+				println("Robot stop from time sensor"); 
+				emit outCmd : outCmd(stopblinking)	
+			}
+		};
+		printCurrentEvent
+	] 
+}
+
+QActor sonarsensor1 context ctxProbRobot {
+	Plan initial normal[
+		println("Sonar1 started");
+		delay 3000
+	]
+	switchTo emitEvents
+	
+	Plan emitEvents[
+		emit sensorEvent : sensorEvent(sonar1)
+	]
+}
+
+QActor sonarsensor2 context ctxProbRobot {
+	Plan initial normal[
+		println("Sonar2 started");
+		delay 3500
+	]
+	switchTo emitEvents
+	
+	Plan emitEvents[
+		emit sensorEvent : sensorEvent(sonar2)
+	]
+}
+
+QActor sonarrobot context ctxProbRobot {
+	Plan initial normal[
+		println("Sonar on board started");
+		delay 5000
+	]
+	switchTo emitEvents
+	
+	Plan emitEvents[
+		emit sensorEvent : sensorEvent(onboardsonar)
+	]
+}
+
+QActor temperaturesensor context ctxProbRobot {
+	Plan initial normal[
+		println("Temperature sensor started");
+		delay 4000
+	]
+	switchTo emitEvents
+	
+	Plan emitEvents[
+		emit sensorEvent : sensorEvent(temp(20));
+		delay 2000;
+		emit sensorEvent : sensorEvent(temp(30))
+	]
+}
+
+QActor timersensor context ctxProbRobot {
+	Plan initial normal[
+		println("Timer sensor started");
+		delay 4500
+	]
+	switchTo emitEvents
+	
+	Plan emitEvents[
+		emit sensorEvent : sensorEvent(timer(9));
+		delay 2000;
+		emit sensorEvent : sensorEvent(timer(12))
+	]
+}
+
+QActor led context ctxProbRobot {
+	Plan initial normal[
+		println("Led started")
+	]
+	switchTo waitForEvent
+	
+	Plan waitForEvent[]	
+	transition stopAfter 600000
+		whenEvent outCmd -> handleEvent
+	finally repeatPlan
+	
+	Plan handleEvent resumeLastPlan [ 
+		onEvent outCmd : outCmd(startblinking) -> println("Led start blinking");
+		onEvent outCmd : outCmd(stopblinking) -> println("Led stop blinking")
+	]  
+}
+
+QActor huelamp context ctxProbRobot {
+	Plan initial normal[
+		println("Hue Lamp started")
+	]
+	switchTo waitForEvent
+	
+	Plan waitForEvent[]	
+	transition stopAfter 600000
+		whenEvent outCmd -> handleEvent
+	finally repeatPlan
+	
+	Plan handleEvent resumeLastPlan [ 
+		onEvent outCmd : outCmd(startblinking) -> println("Hue Lamp start blinking");
+		onEvent outCmd : outCmd(stopblinking) -> println("Hue Lamp stop blinking")
+	]  
+}

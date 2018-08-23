@@ -1,0 +1,6 @@
+plan(1,init, sentence(true,move(print("robot_movement_finder STARTED")),'','' ))
+plan(1,applLogic, sentence(true,eventswitch(modelChanged, »modelChanged( resource( name( robot),state( movement( stopped),X))), raise( local_BlinkOff , blinkOff )') ),'','' ))
+plan(2,applLogic, sentence(true,eventswitch(modelChanged, »modelChanged( resource( name( robot),state( movement( movingForward),X))), raise( local_BlinkOn , blinkOn )') ),'','' ))
+plan(3,applLogic, sentence(true,eventswitch(modelChanged, »modelChanged( resource( name( robot),state( movement( movingBackward),X))), raise( local_BlinkOn , blinkOn )') ),'','' ))
+plan(4,applLogic, sentence(true,eventswitch(modelChanged, »modelChanged( resource( name( robot),state( movement( movingForward),obstacleDetected( true)))), raise( local_BlinkOff , blinkOff )') ),'','' ))
+plan(5,applLogic, sentence(true,move(resumeplan),'','' ))
