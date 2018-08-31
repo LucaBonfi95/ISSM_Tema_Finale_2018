@@ -270,8 +270,8 @@ Questa situazione si verifica quando il robot trova uno o più ostacoli che gli 
 
 Vengono di seguito riportati i modelli formali risultati dall'analisi dei requisiti:
 
-\lstinputlisting[label={lst:reqAnalysisRobot}]{../src/sprint4/req_analysis/reqAnalysisRobot.qa}
-\lstinputlisting[label={lst:reqAnalysisUser}]{../src/sprint4/req_analysis/reqAnalysisUser.qa}
+\lstinputlisting[label={lst:reqAnalysisRobot}]{../src/sprint5/req_analysis/reqAnalysisRobot.qa}
+\lstinputlisting[label={lst:reqAnalysisUser}]{../src/sprint5/req_analysis/reqAnalysisUser.qa}
 
 Prima di descrivere più dettagliatamente i modelli prodotti durante l'analisi dei requisiti è necessaria una premessa relativa alle modalità di interazione dei componenti del sistema. Trattandosi di un sistema eterogeneo distribuito, ed utilizzando il linguaggio di modellazione \action{QActor}, le due modalità con cui i componenti all'interno del sistema possono interagire sono quelle ad eventi e messaggi. 
 
@@ -306,15 +306,31 @@ Per quanto riguarda l'interazione gui-robot è più opportuno che essa sia model
 
 \section{Analisi del problema}
 \labelsec{ProblemAnalysis}
-Il primo problema che sorge è quello di stabilire quale nodo si occuperà di autenticare l'utente. Una possibilità è che sia sul nodo del robot: in questo caso il robot potrebbe non disporre delle adeguate risorse computazionali per gestire il processo di autenticazione, tuttavia questo garantirebbe maggiore sicurezza. Un'altra possibilità è che l'autenticazione sia su un nodo diverso rispetto a quello del robot: ciò consente di non utilizzare le risorse computazionali del robot richiedendo però maggiori accortezze sulla sicurezza. In quest'ultimo caso l'autenticazione potrebbe essere gestita dal nodo dell'utente oppure da un nodo distinto, il quale comporterebbe costi maggiori.
+Il primo problema che sorge è quello di stabilire quale nodo si occuperà di autenticare l'utente. Una possibilità è quella di relegare l'autenticazione al nodo del robot: in questo caso il robot potrebbe non disporre delle adeguate risorse computazionali per gestire il processo di autenticazione, tuttavia questo garantirebbe maggiore sicurezza. Un'altra possibilità è che l'autenticazione venga gestita da un nodo diverso rispetto a quello del robot: ciò consentirebbe di non utilizzare le risorse computazionali del robot richiedendo però maggiori accortezze sulla sicurezza. In quest'ultimo caso l'autenticazione potrebbe essere gestita dal nodo dell'utente oppure da un nodo distinto, il quale comporterebbe costi maggiori.
 
 Un altro problema è quello dell'interfaccia \action{GUI}, che deve poter eseguire su dispositivi eterogenei. A tal proposito, una possibilità sarebbe creare client nativi per ogni piattaforma con costi elevati oppure più semplicemente utilizzare una pagina web. 
 
 La comunicazione tra utente e robot tramite \action{GUI} può avvenire via messaggi o via eventi. La comunicazione ad eventi permette di disaccoppiare \action{GUI} e robot, consentendo di utilizzare un'unica \action{GUI} per comunicare con diversi robot. Utilizzando gli eventi può essere adottato un approccio \code{event-based} o un approccio \code{event-driven}. Nell'approccio \code{event-based} il robot non sarebbe sempre sensibile agli eventi, potendone perdere alcuni. Al contrario, nell'approccio \code{event-driven} il robot sarebbe sempre sensibile agli eventi perdendo tuttavia reattività.
-\\
 
-\lstinputlisting[label={lst:probAnalysisRobot}]{../src/sprint4/prob_analysis/probAnalysisRobot.qa}
-\lstinputlisting[label={lst:probAnalysisUser}]{../src/sprint4/prob_analysis/probAnalysisUser.qa}
+Vengono di seguito riportati i modelli formali risultati dall'analisi del problema: 
+
+\lstinputlisting[label={lst:probAnalysisRobot}]{../src/sprint5/prob_analysis/probAnalysisRobot.qa}
+\lstinputlisting[label={lst:probAnalysisUser}]{../src/sprint5/prob_analysis/probAnalysisUser.qa}
+
+In conseguenza a quanto emerso dall'analisi dei requisiti, il sistema \action{systemRobot} è stato modellato come composizione di due contesti, rinominati per comodità \action{ctxProbRobot} e \action{ctxProbUser}. 
+
+Per ciò che riguarda il contesto standalone \action{ctxProbRobot}, la logica necessaria a soddisfare i requisiti \code{R-TempOk} e \code{R-TimeOk} è stata modellata attraverso una base di conoscenza espressa tramite regole Prolog inserite all'interno del QActor \textbf{robot}. \\ Come emerso in analisi dei requisiti il robot deve essere sensibile agli eventi \textbf{robotCmd : robotCmd(X)} e \textbf{sensorEvent : sensorEvent(X)}. \\ In particolare: 
+\begin{itemize}
+	\item alla ricezione dell'evento \textbf{robotCmd : robotCmd(cmdstart)} il QActor \textbf{robot} controlla che siano soddisfatti i requisiti di tempo e temperatura ed emette l'evento \textbf{outCmd : outCmd(startblinking)} necessario ad avviare il blinking del led e della lampada hue. Quindi controlla se sia già stata costruita una mappa della stanza: in caso affermativo segue il percorso ottimo fino alla destinazione, mentre in caso contrario procede alla costruzione della mappa della stanza;
+	\item alla ricezione dell'evento \textbf{robotCmd : robotCmd(cmdstop)} viene emesso l'evento \textbf{outCmd : outCmd(stopblinking)} necessario ad interrompere il blinking del led e della lampada hue;
+	\item alla ricezione dell'evento \textbf{sensorEvent : sensorEvent(sonar2)}, emesso in corrispondenza del passaggio del robot davanti al secondo sonar, se non presente in precedenza viene aggiunta la mappa della stanza alla base di conoscenza Prolog del robot;
+	\item alla ricezione dell'evento \textbf{sensorEvent : sensorEvent(onboardsonar)}, emesso nel caso in cui il robot si imbatta in un ostacolo, il robot si ferma per poi tentare di superare l'ostacolo: nel caso in cui si tratti di un ostacolo fisso cerca di aggirarlo;
+	\item alla ricezione degli eventi \textbf{sensorEvent : sensorEvent(temp(X))} e \textbf{sensorEvent : sensorEvent(timer(X))} viene controllato che siano ancora soddisfatti rispettivamente il requisito di temperatura ed il requisito di tempo, ed in caso contrario viene emesso l'evento \textbf{outCmd : outCmd(stopblinking)} necessario ad interrompere il blinking di led e lampada hue.
+\end{itemize}
+I QActor \textbf{sonarsensor1}, \textbf{sonarsensor2}, \textbf{sonarrobot}, \textbf{temperaturesensor} e \textbf{timersensor} emettono eventi \textbf{sensorEvent : sensorEvent(X)} con un payload specifico in base al tipo di sensore che rappresentano: il QActor robot deve essere sensibile a questi eventi. \\
+I QActor \textbf{huelamp} e \textbf{led} modellano invece i dispositivi attuatori, ed entrambi si mettono in attesa degli eventi \textbf{outCmd : outCmd(startblinking)} e \textbf{outCmd : outCmd(stopblinking)}, alla ricezione dei quali rispettivamente avviano o interrompono il blinking. 
+
+Per quanto riguarda il contesto \action{ctxProbUser} il QActor \textbf{user} modella l'utente che, una volta autenticato, può inviare messaggi \textbf{userCmd : userCmd(cmdstart)} e \textbf{userCmd : userCmd(cmdstop)} all'attore \textbf{gui}, che a sua volta, alla ricezione dei messaggi, si occupa di emettere gli eventi corrispondenti, eventi a cui deve essere sensibile il robot. 
 
 %=========================================================================
 
@@ -323,11 +339,11 @@ La comunicazione tra utente e robot tramite \action{GUI} può avvenire via messa
 %=========================================================================
 
 \lstinputlisting[label={lst:designResourseModel}]{../src/sprint4/design/it.unibo.finaltask2018.design/src/resourceModel.qa}
-\lstinputlisting[label={lst:designAppl}]{../src/sprint4/design/it.unibo.finaltask2018.design/src/applicationLogic.qa}
-\lstinputlisting[label={lst:designOut}]{../src/sprint4/design/it.unibo.finaltask2018.design/src/output.qa}
-\lstinputlisting[label={lst:designIn}]{../src/sprint4/design/it.unibo.finaltask2018.design/src/input.qa}
-\lstinputlisting[label={lst:designIn}]{../src/sprint4/design/it.unibo.finaltask2018.design/src/real_robot_adapter.qa}
-\lstinputlisting[label={lst:designIn}]{../src/sprint4/design/it.unibo.finaltask2018.design/src/real_led_adapter.qa}
+\lstinputlisting[label={lst:designAppl}]{../src/sprint5/design/it.unibo.finaltask2018.design/src/applicationLogic.qa}
+\lstinputlisting[label={lst:designOut}]{../src/sprint5/design/it.unibo.finaltask2018.design/src/output.qa}
+\lstinputlisting[label={lst:designIn}]{../src/sprint5/design/it.unibo.finaltask2018.design/src/input.qa}
+\lstinputlisting[label={lst:designIn}]{../src/sprint5/design/it.unibo.finaltask2018.design/src/real_robot_adapter.qa}
+\lstinputlisting[label={lst:designIn}]{../src/sprint5/design/it.unibo.finaltask2018.design/src/real_led_adapter.qa}
 
 
 \section{Implementazione}
