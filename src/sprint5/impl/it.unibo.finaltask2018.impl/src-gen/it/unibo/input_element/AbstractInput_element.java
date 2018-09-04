@@ -90,6 +90,14 @@ public abstract class AbstractInput_element extends QActor {
 	     PlanRepeat pr = PlanRepeat.setUp("working",-1);
 	    	String myselfName = "working";  
 	    	//delay  ( no more reactive within a plan)
+	    	aar = delayReactive(2450,"" , "");
+	    	if( aar.getInterrupted() ) curPlanInExec   = "working";
+	    	if( ! aar.getGoon() ) return ;
+	    	temporaryStr = QActorUtils.unifyMsgContent(pengine, "robotMovement(VALUE)","robotMovement(movingForward)", guardVars ).toString();
+	    	emit( "robotMovement", temporaryStr );
+	    	temporaryStr = "\"Now the robot is moving\"";
+	    	println( temporaryStr );  
+	    	//delay  ( no more reactive within a plan)
 	    	aar = delayReactive(4000,"" , "");
 	    	if( aar.getInterrupted() ) curPlanInExec   = "working";
 	    	if( ! aar.getGoon() ) return ;

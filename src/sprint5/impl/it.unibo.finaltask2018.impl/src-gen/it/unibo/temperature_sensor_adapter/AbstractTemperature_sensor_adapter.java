@@ -76,7 +76,6 @@ public abstract class AbstractTemperature_sensor_adapter extends QActor {
 	    	String myselfName = "init";  
 	    	temporaryStr = "\"resource_model STARTED\"";
 	    	println( temporaryStr );  
-	    	it.unibo.temperature_sensor_adapter.webTemperatureSensorAdapter.init( myself  );
 	    	//delay  ( no more reactive within a plan)
 	    	aar = delayReactive(500,"" , "");
 	    	if( aar.getInterrupted() ) curPlanInExec   = "init";
@@ -96,7 +95,7 @@ public abstract class AbstractTemperature_sensor_adapter extends QActor {
 	     pr.incNumIter(); 	
 	    	String myselfName = "sendEvents";  
 	    	//delay  ( no more reactive within a plan)
-	    	aar = delayReactive(10000,"" , "");
+	    	aar = delayReactive(1000,"" , "");
 	    	if( aar.getInterrupted() ) curPlanInExec   = "sendEvents";
 	    	if( ! aar.getGoon() ) return ;
 	    	it.unibo.temperature_sensor_adapter.webTemperatureSensorAdapter.updateTemperature( myself  );

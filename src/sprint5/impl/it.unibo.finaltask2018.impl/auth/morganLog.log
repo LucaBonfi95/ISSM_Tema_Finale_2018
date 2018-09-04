@@ -127,3 +127,8 @@
 ::1 - GET /login HTTP/1.1 200 1237 - 17.055 ms
 ::1 - POST /login HTTP/1.1 302 58 - 361.013 ms
 ::1 - GET /access HTTP/1.1 200 3042 - 6.626 ms
+::1 - GET / HTTP/1.1 200 1185 - 16.400 ms
+::1 - GET /favicon.ico HTTP/1.1 200 99678 - 6.130 ms
+::1 - POST /login HTTP/1.1 - - - - ms
+::1 - GET / HTTP/1.1 304 - - 3.501 ms
+::1 - POST /login HTTP/1.1 - - - - ms

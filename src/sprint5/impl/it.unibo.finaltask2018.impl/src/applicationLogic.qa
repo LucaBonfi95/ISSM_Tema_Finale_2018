@@ -7,6 +7,9 @@ Event modelChanged 		: modelChanged(resource(NAME, STATE))
 Event local_BlinkOn 	: blinkOn
 Event local_BlinkOff 	: blinkOff 
 
+Event userstart : userstart(X)
+Event userstop : userstop(X)
+
 // se si usa con il robot fisico al posto di localhost bisogna mettere l'indirizzo del pc
 Context ctxResourceModel ip[host="localhost" port=8099] -standalone 
 Context ctxApplicationLogic ip[host="localhost" port=8097]
@@ -81,4 +84,79 @@ QActor blink_controller context ctxApplicationLogic {
 		whenTime 500 -> ledBlinkingOn,
 		whenEvent local_BlinkOff -> ledOff
 	
+}
+
+QActor initial_conditions_checker context ctxApplicationLogic {
+	Rules {
+		timeIsOk(false).
+		temperatureIsOk(false).
+		
+		startRequirementsOk :- timeIsOk(true), temperatureIsOk(true).
+	}
+	Plan init normal [
+		println("initial_conditions_checker STARTED")
+	]
+	switchTo waitForEvents
+	
+	Plan waitForEvents []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> checkEvent,
+		whenEvent userstart -> checkConditions
+	finally
+		repeatPlan
+		
+	Plan checkEvent resumeLastPlan [
+		onEvent modelChanged : modelChanged(resource(name(temperatureIsOk), state(X))) -> ReplaceRule temperatureIsOk(_) with temperatureIsOk(X);
+		onEvent modelChanged : modelChanged(resource(name(timeIsOk), state(X))) -> ReplaceRule timeIsOk(_) with timeIsOk(X) 
+	]
+	
+	Plan checkConditions resumeLastPlan [
+		onEvent userstart : userstart(user) -> {
+			[ !? startRequirementsOk ] 
+				delay 1000 //TODO interagisce con classe Java che si occupa di muovere il robot
+		}
+	]
+	
+}
+
+QActor stop_conditions_checker context ctxApplicationLogic {
+	Plan init normal [
+		println("stop_conditions_checker STARTED")
+	]
+	switchTo waitForEvents
+	
+	Plan waitForEvents []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> stopRobot,
+		whenEvent userstop -> stopRobot
+	finally
+		repeatPlan
+	
+	Plan stopRobot resumeLastPlan [
+		onEvent modelChanged : modelChanged(resource(name(temperatureIsOk), state(false))) -> delay 1000; //TODO interagisce con classe Java che si occupa di muovere il robot
+		onEvent modelChanged : modelChanged(resource(name(timeIsOk), state(false))) -> delay 1000; //TODO interagisce con classe Java che si occupa di muovere il robot
+		onEvent userstop : userstop(user) -> delay 1000 //TODO interagisce con classe Java che si occupa di muovere il robot
+	]
+}
+
+QActor sonar_checker context ctxApplicationLogic {
+	Plan init normal [
+		println("sonar_checker STARTED")
+	]
+	switchTo waitForEvents
+	
+	Plan waitForEvents []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> handleSonar
+	finally
+		repeatPlan
+		
+	Plan handleSonar resumeLastPlan [
+		onEvent modelChanged : modelChanged(resource(name(sonar1), state(somethingDetected(true), _))) -> delay 1000; //TODO interagisce con classe Java che si occupa di muovere il robot
+		onEvent modelChanged : modelChanged(resource(name(sonar2), state(somethingDetected(true), _))) -> delay 1000; //TODO interagisce con classe Java che si occupa di muovere il robot
+		onEvent modelChanged : modelChanged(resource(name(robot), state(movement(stopped), obstacleDetected(true)))) -> delay 1000 //TODO interagisce con classe Java che si occupa di muovere il robot
+	]
 }
