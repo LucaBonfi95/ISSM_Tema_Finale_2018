@@ -1,2 +1,5 @@
 plan(1,init, sentence(true,move(print("input_element STARTED")),'','' ))
-plan(1,working, sentence(true,delay( 4000) ,'','' ))
+plan(1,working, sentence(true,delay( 2450) ,'','' ))
+plan(2,working, sentence(true,raise( robotMovement , robotMovement( movingForward) )'),'','' ))
+plan(3,working, sentence(true,move(print("Now the robot is moving")),'','' ))
+plan(4,working, sentence(true,delay( 4000) ,'','' ))
