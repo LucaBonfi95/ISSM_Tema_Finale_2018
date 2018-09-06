@@ -112,11 +112,11 @@ public abstract class AbstractRobot_movement_finder extends QActor {
 	    	if( currentEvent != null && currentEvent.getEventId().equals("modelChanged") && 
 	    		pengine.unify(curT, Term.createTerm("modelChanged(resource(NAME,STATE))")) && 
 	    		pengine.unify(curT, Term.createTerm( currentEvent.getMsg() ) )){ 
-	    			String parg="blinkOff";
-	    			/* RaiseEvent */
+	    			String parg="msgBlinkOff";
+	    			/* SendDispatch */
 	    			parg = updateVars(Term.createTerm("modelChanged(resource(NAME,STATE))"),  Term.createTerm("modelChanged(resource(name(robot),state(movement(stopped),X)))"), 
 	    				    		  					Term.createTerm(currentEvent.getMsg()), parg);
-	    			if( parg != null ) emit( "local_BlinkOff", parg );
+	    			if( parg != null ) sendMsg("msgBlinkOff","blink_controller", QActorContext.dispatch, parg ); 
 	    	}
 	    	//onEvent 
 	    	setCurrentMsgFromStore(); 
@@ -124,11 +124,11 @@ public abstract class AbstractRobot_movement_finder extends QActor {
 	    	if( currentEvent != null && currentEvent.getEventId().equals("modelChanged") && 
 	    		pengine.unify(curT, Term.createTerm("modelChanged(resource(NAME,STATE))")) && 
 	    		pengine.unify(curT, Term.createTerm( currentEvent.getMsg() ) )){ 
-	    			String parg="blinkOn";
-	    			/* RaiseEvent */
+	    			String parg="msgBlinkOn";
+	    			/* SendDispatch */
 	    			parg = updateVars(Term.createTerm("modelChanged(resource(NAME,STATE))"),  Term.createTerm("modelChanged(resource(name(robot),state(movement(movingForward),X)))"), 
 	    				    		  					Term.createTerm(currentEvent.getMsg()), parg);
-	    			if( parg != null ) emit( "local_BlinkOn", parg );
+	    			if( parg != null ) sendMsg("msgBlinkOn","blink_controller", QActorContext.dispatch, parg ); 
 	    	}
 	    	//onEvent 
 	    	setCurrentMsgFromStore(); 
@@ -136,23 +136,11 @@ public abstract class AbstractRobot_movement_finder extends QActor {
 	    	if( currentEvent != null && currentEvent.getEventId().equals("modelChanged") && 
 	    		pengine.unify(curT, Term.createTerm("modelChanged(resource(NAME,STATE))")) && 
 	    		pengine.unify(curT, Term.createTerm( currentEvent.getMsg() ) )){ 
-	    			String parg="blinkOn";
-	    			/* RaiseEvent */
+	    			String parg="msgBlinkOn";
+	    			/* SendDispatch */
 	    			parg = updateVars(Term.createTerm("modelChanged(resource(NAME,STATE))"),  Term.createTerm("modelChanged(resource(name(robot),state(movement(movingBackward),X)))"), 
 	    				    		  					Term.createTerm(currentEvent.getMsg()), parg);
-	    			if( parg != null ) emit( "local_BlinkOn", parg );
-	    	}
-	    	//onEvent 
-	    	setCurrentMsgFromStore(); 
-	    	curT = Term.createTerm("modelChanged(resource(name(robot),state(movement(movingForward),obstacleDetected(true))))");
-	    	if( currentEvent != null && currentEvent.getEventId().equals("modelChanged") && 
-	    		pengine.unify(curT, Term.createTerm("modelChanged(resource(NAME,STATE))")) && 
-	    		pengine.unify(curT, Term.createTerm( currentEvent.getMsg() ) )){ 
-	    			String parg="blinkOff";
-	    			/* RaiseEvent */
-	    			parg = updateVars(Term.createTerm("modelChanged(resource(NAME,STATE))"),  Term.createTerm("modelChanged(resource(name(robot),state(movement(movingForward),obstacleDetected(true))))"), 
-	    				    		  					Term.createTerm(currentEvent.getMsg()), parg);
-	    			if( parg != null ) emit( "local_BlinkOff", parg );
+	    			if( parg != null ) sendMsg("msgBlinkOn","blink_controller", QActorContext.dispatch, parg ); 
 	    	}
 	    	repeatPlanNoTransition(pr,myselfName,"robot_movement_finder_"+myselfName,false,true);
 	    }catch(Exception e_applLogic){  
