@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6630 64-bit) (preloaded format=pdflatex 2018.3.13)  6 SEP 2018 11:26
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6630 64-bit) (preloaded format=pdflatex 2018.3.13)  10 SEP 2018 19:27
 entering extended mode
 **./main.tex
 (main.tex
@@ -642,20 +642,20 @@ LaTeX Warning: Label `lst:designIn' multiply defined.
 )
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 147.
-LaTeX Font Info:    ... okay on input line 147.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 147.
-LaTeX Font Info:    ... okay on input line 147.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 147.
-LaTeX Font Info:    ... okay on input line 147.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 147.
-LaTeX Font Info:    ... okay on input line 147.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 147.
-LaTeX Font Info:    ... okay on input line 147.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 147.
-LaTeX Font Info:    ... okay on input line 147.
-LaTeX Info: Redefining \it@ocap on input line 147.
-LaTeX Info: Redefining \it@ccap on input line 147.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 148.
+LaTeX Font Info:    ... okay on input line 148.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 148.
+LaTeX Font Info:    ... okay on input line 148.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 148.
+LaTeX Font Info:    ... okay on input line 148.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 148.
+LaTeX Font Info:    ... okay on input line 148.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 148.
+LaTeX Font Info:    ... okay on input line 148.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 148.
+LaTeX Font Info:    ... okay on input line 148.
+LaTeX Info: Redefining \it@ocap on input line 148.
+LaTeX Info: Redefining \it@ccap on input line 148.
 
 ("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\context\base\su
 pp-pdf.mkii"
@@ -708,10 +708,10 @@ Package grfext Info: Graphics extension search list:
 )
 \c@lstlisting=\count137
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 161.
+(Font)              <7> on input line 162.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 161.
-LaTeX Font Info:    Try loading font information for T1+cmtt on input line 161.
+(Font)              <5> on input line 162.
+LaTeX Font Info:    Try loading font information for T1+cmtt on input line 162.
 
 
 ("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\t1cm
@@ -730,10 +730,10 @@ ain.toc)
 <img/virtualRobot.jpg, id=19, 311.66437pt x 274.52562pt>
 File: img/virtualRobot.jpg Graphic file (type jpg)
 <use img/virtualRobot.jpg>
-Package pdftex.def Info: img/virtualRobot.jpg  used on input line 215.
+Package pdftex.def Info: img/virtualRobot.jpg  used on input line 216.
 (pdftex.def)             Requested size: 218.16356pt x 192.16661pt.
  [4 <./img/virtualRobot.jpg>]
-LaTeX Font Info:    Try loading font information for T1+cmss on input line 253.
+LaTeX Font Info:    Try loading font information for T1+cmss on input line 254.
 
 
 ("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\t1cm
@@ -743,7 +743,7 @@ File: t1cmss.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 <img/requirements_analysis.png, id=25, 772.8875pt x 681.54625pt>
 File: img/requirements_analysis.png Graphic file (type png)
 <use img/requirements_analysis.png>
-Package pdftex.def Info: img/requirements_analysis.png  used on input line 257.
+Package pdftex.def Info: img/requirements_analysis.png  used on input line 258.
 
 (pdftex.def)             Requested size: 309.14952pt x 272.61366pt.
 
@@ -773,17 +773,17 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 n1.def"
 File: latin1.def 2015/03/17 v1.2c Input encoding file
 ) [9]
-Underfull \hbox (badness 10000) in paragraph at lines 280--281
+Underfull \hbox (badness 10000) in paragraph at lines 281--282
 
  []
 
 [10]
-Underfull \hbox (badness 10000) in paragraph at lines 295--298
+Underfull \hbox (badness 10000) in paragraph at lines 296--299
 
  []
 
 
-Overfull \hbox (9.1564pt too wide) in paragraph at lines 302--303
+Overfull \hbox (9.1564pt too wide) in paragraph at lines 303--304
 []\T1/cmr/bx/n/10 gui\T1/cmr/m/n/10 : riceve i mes-saggi \T1/cmr/bx/n/10 user-C
 md : user-Cmd(X) \T1/cmr/m/n/10 emet-tendo eventi \T1/cmr/bx/n/10 robotCmd
  []
@@ -802,29 +802,32 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [15]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [16]
 ("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\lati
 n1.def"
 File: latin1.def 2015/03/17 v1.2c Input encoding file
-) [16]
-Overfull \hbox (10.93158pt too wide) in paragraph at lines 322--323
+) [17]
+Overfull \hbox (10.93158pt too wide) in paragraph at lines 323--324
 []\T1/cmr/m/n/10 In con-seguenza a quanto emerso dall'analisi dei req-ui-siti, 
 il sis-tema \T1/cmtt/m/n/10 systemRobot
  []
 
-[17]
-Overfull \hbox (2.71185pt too wide) in paragraph at lines 330--331
+[18]
+Overfull \hbox (2.71185pt too wide) in paragraph at lines 333--334
 \T1/cmr/m/n/10 sod-dis-fatti rispet-ti-va-mente il req-ui-sito di tem-per-atura
  ed il req-ui-sito di tempo,
  []
 
 
-Overfull \hbox (8.2605pt too wide) in paragraph at lines 330--331
+Overfull \hbox (8.2605pt too wide) in paragraph at lines 333--334
 \T1/cmr/m/n/10 ed in caso con-trario viene emesso l'evento \T1/cmr/bx/n/10 out-
 Cmd : out-Cmd(stopblinking)
  []
 
-
-Overfull \hbox (11.59859pt too wide) in paragraph at lines 335--336
+[19]
+Overfull \hbox (11.59859pt too wide) in paragraph at lines 344--345
 \T1/cmr/m/n/10 che, una volta au-t-en-ti-cato, può in-viare mes-saggi \T1/cmr/b
 x/n/10 user-Cmd : user-Cmd(cmdstart)
  []
@@ -833,40 +836,33 @@ x/n/10 user-Cmd : user-Cmd(cmdstart)
 ("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\lati
 n1.def"
 File: latin1.def 2015/03/17 v1.2c Input encoding file
-) [18]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [19]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [20]
+) [20]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [21]
-("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\lati
-n1.def"
-File: latin1.def 2015/03/17 v1.2c Input encoding file
-) [22]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [22]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [23]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [24]
 ("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\lati
 n1.def"
 File: latin1.def 2015/03/17 v1.2c Input encoding file
-) [24]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [25]
+) [25]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [26]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [27]
 ("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\lati
 n1.def"
 File: latin1.def 2015/03/17 v1.2c Input encoding file
-) [28]
+) [27]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [28]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [29]
@@ -874,43 +870,50 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 n1.def"
 File: latin1.def 2015/03/17 v1.2c Input encoding file
 ) [30]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [31]
 ("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\lati
 n1.def"
 File: latin1.def 2015/03/17 v1.2c Input encoding file
-) [31] [32]
+) [32]
+("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\lati
+n1.def"
+File: latin1.def 2015/03/17 v1.2c Input encoding file
+) [33] [34]
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <9> on input line 381.
+(Font)              <9> on input line 390.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 381.
-<img/foto_authA.jpg, id=121, 222.8325pt x 301.125pt>
+(Font)              <6> on input line 390.
+<img/foto_authA.jpg, id=127, 222.8325pt x 301.125pt>
 File: img/foto_authA.jpg Graphic file (type jpg)
 <use img/foto_authA.jpg>
-Package pdftex.def Info: img/foto_authA.jpg  used on input line 386.
+Package pdftex.def Info: img/foto_authA.jpg  used on input line 395.
 (pdftex.def)             Requested size: 89.13141pt x 120.44786pt.
-<img/foto_authB.jpg, id=122, 319.1925pt x 508.90125pt>
+<img/foto_authB.jpg, id=128, 319.1925pt x 508.90125pt>
 File: img/foto_authB.jpg Graphic file (type jpg)
 <use img/foto_authB.jpg>
-Package pdftex.def Info: img/foto_authB.jpg  used on input line 387.
+Package pdftex.def Info: img/foto_authB.jpg  used on input line 396.
 (pdftex.def)             Requested size: 82.98808pt x 132.3112pt.
-<img/foto_authC.png, id=123, 108.405pt x 120.45pt>
+<img/foto_authC.png, id=129, 108.405pt x 120.45pt>
 File: img/foto_authC.png Graphic file (type png)
 <use img/foto_authC.png>
-Package pdftex.def Info: img/foto_authC.png  used on input line 388.
+Package pdftex.def Info: img/foto_authC.png  used on input line 397.
 (pdftex.def)             Requested size: 108.40472pt x 120.44969pt.
- [33 <./img/foto_authA.jpg> <./img/foto_authB.jpg> <./img/foto_authC.png>] (mai
+ [35 <./img/foto_authA.jpg> <./img/foto_authB.jpg> <./img/foto_authC.png>] (mai
 n.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 5747 strings out of 493305
- 80591 string characters out of 3125885
- 436788 words of memory out of 3000000
- 9151 multiletter control sequences out of 15000+200000
+ 5777 strings out of 493305
+ 80934 string characters out of 3125885
+ 403455 words of memory out of 3000000
+ 9181 multiletter control sequences out of 15000+200000
  15281 words of font info for 34 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 39i,13n,40p,810b,2119s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 39i,13n,40p,1236b,2127s stack positions out of 5000i,500n,10000p,200000b,50000s
  <C:\Users\Antonio Grasso\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\e
 c\dpi600\ecrm0500.pk> <C:\Users\Antonio Grasso\AppData\Local\MiKTeX\2.9\fonts\p
 k\ljfour\jknappen\ec\dpi600\ecsi1000.pk> <C:\Users\Antonio Grasso\AppData\Local
@@ -929,9 +932,9 @@ ppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/
 Users/Antonio Grasso/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfo
 nts/cm/cmsy10.pfb><C:/Users/Antonio Grasso/AppData/Local/Programs/MiKTeX 2.9/fo
 nts/type1/public/amsfonts/cm/cmsy7.pfb>
-Output written on main.pdf (33 pages, 431946 bytes).
+Output written on main.pdf (35 pages, 442983 bytes).
 PDF statistics:
- 533 PDF objects out of 1000 (max. 8388607)
+ 547 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  26 words of extra memory for PDF output out of 10000 (max. 10000000)
 

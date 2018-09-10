@@ -7,6 +7,6 @@
 \contentsline {section}{\numberline {3}Requisiti}{4}
 \contentsline {section}{\numberline {4}Analisi dei requisiti}{5}
 \contentsline {section}{\numberline {5}Analisi del problema}{11}
-\contentsline {section}{\numberline {6}Progettazione}{18}
-\contentsline {section}{\numberline {7}Implementazione}{32}
-\contentsline {section}{\numberline {8}Autori}{33}
+\contentsline {section}{\numberline {6}Progettazione}{20}
+\contentsline {section}{\numberline {7}Implementazione}{34}
+\contentsline {section}{\numberline {8}Autori}{35}

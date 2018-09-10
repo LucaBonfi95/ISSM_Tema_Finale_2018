@@ -4,6 +4,8 @@ Event robotCmd : robotCmd(X)
 Event sensorEvent : sensorEvent(X)
 Event outCmd : outCmd(X)
 
+Dispatch robotMindCmd : robotMindCmd(X)
+
 Context ctxProbRobot ip[host="localhost" port=5400] 
 
 QActor robot context ctxProbRobot {  
@@ -47,32 +49,17 @@ QActor robot context ctxProbRobot {
 				println("Robot start"); 
 				emit outCmd : outCmd(startblinking);
 				[ !? map ] 
-					println("Il robot segue il percorso ottimo")
+					println("Robot cleans room (following optimal path)");
+					forward robotmind -m robotMindCmd : robotMindCmd(clean)
 				else 
-					println("Mentre il robot è in azione deve costruire la mappa")
+					println("Robot builds room map");
+					forward robotmind -m robotMindCmd : robotMindCmd(explore)
 			}
 		}; 
 		onEvent robotCmd : robotCmd(cmdstop) -> { 
 			println("Robot stop from user"); 
 			emit outCmd : outCmd(stopblinking)	
 		}; 
-		onEvent sensorEvent : sensorEvent(sonar1) -> println("Robot receives event from sonar1");
-		onEvent sensorEvent : sensorEvent(sonar2) -> {
-			emit robotCmd : robotCmd(cmdstop); // il robot ha finito
-			[ !? map ]
-				addRule map // se non c'era una mappa precedente viene creata 
-		};
-		onEvent sensorEvent : sensorEvent(onboardsonar) -> {
-			//the robot stops for a while and then retries
-			println("Robot stop");
-			// se è la prima volta che incontra un ostacolo: 
-			delay 500;
-			println("Il robot prova di nuovo ad andare avanti");
-			// se invece è la seconda volta che incontra lo stesso ostacolo:
-			println("Il robot prova ad andare a destra o a sinistra");
-			// se non si può andare né a destra né a sinistra allora il robot si ferma:
-			emit robotCmd : robotCmd(cmdstop)
-		};
 		onEvent sensorEvent : sensorEvent(temp(VALUE)) -> ReplaceRule currentTempValue(X) with currentTempValue(VALUE);
 		onEvent sensorEvent : sensorEvent(temp(X)) -> {
 			[ not !? evalTemp ] {
@@ -89,6 +76,78 @@ QActor robot context ctxProbRobot {
 		};
 		printCurrentEvent
 	] 
+}
+
+QActor robotmind context ctxProbRobot {
+	Rules{
+		// size: index of last X cell and Y cell
+		dimX(0).
+		dimY(0).
+		incrementX:- dimX(X), retract(dimX(_)), X1 is X + 1, assert(dimX(X1)).
+		incrementY:- dimY(Y), retract(dimY(_)), Y1 is Y + 1, assert(dimY(Y1)).
+		// robot direction
+		dir(Y). 
+	}
+	Plan initial normal[
+		println("Robotmind started")
+	]
+	switchTo waitForMessage
+	
+	Plan waitForMessage [
+	]
+	transition stopAfter 600000
+		whenMsg robotMindCmd -> handleMovement,
+		whenEvent sensorEvent -> handleMovement
+	finally repeatPlan
+	
+	// ASSUMPTION: there are no obstacles in the room
+	Plan handleMovement [
+		onMsg robotMindCmd : robotMindCmd(explore) -> {
+			// doBasicStep() static method of robot class that must listen to events sensorEvent : sensorEvent(onboardsonar) 
+			javaRun robot.doBasicStep(); 
+			// robot starts from start-point towards the bottom-side, it changes its direction when it receives
+			// the event sensorEvent : sensorEvent(sonar2) and it goes forward until it hits the second sonar 
+			[?? basicStepResult(true)] {
+				[!? dir(X)]
+				 	demo incrementX
+				else
+					demo incrementY;
+				selfMsg robotMindCmd : robotMindCmd(explore) 
+			} 
+			else {
+				demo assert(map);
+				[!? dimX(X)] 
+					javaRun planner.setSizeX(X);
+				[!? dimY(Y)]
+					javaRun planner.setSizeY(Y);				
+				selfMsg robotMindCmd : robotMindCmd(clean)
+			}
+		};
+		onEvent sensorEvent : sensorEvent(sonar2) -> {
+			demo retract(dir(Y));
+			demo assert(dir(X))
+		};
+		onMsg robotMindCmd : robotMindCmd(clean) -> {
+			// nextMove = basicStep or 90 degree rotation + basicStep
+			javaRun planner.nextMove(); 
+			// nextMove(X,Y): 
+			// X = rotation (n = none, l = left, r = right); 
+			// Y = move (n = none, w = forward)
+			[!? nextMove(n,w)] 
+				javaRun robot.doBasicStep();
+			[!? nextMove(l,w)] {
+				javaRun robot.turnLeft();
+				javaRun robot.doBasicStep()
+			};
+			[!? nextMove(r,w)] {
+				javaRun robot.turnRight();
+				javaRun robot.doBasicStep()
+			};
+			[?? nextMove(_,w)]
+				selfMsg robotMindCmd : robotMindCmd(clean)
+		}
+		
+	]
 }
 
 QActor sonarsensor1 context ctxProbRobot {
