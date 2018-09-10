@@ -268,6 +268,8 @@ L'attore "Robot" si occupa inoltre di gestire la logica applicativa, che consist
 Inoltre, se l'attore "Robot" trova un ostacolo che non riesce ad evitare si deve fermare (\code{R-Obstacle}).
 Questa situazione si verifica quando il robot trova uno o più ostacoli che gli impediscono di raggiungere il secondo sonar.
 
+Per formalizzare il requisito \code{R-FloorClean} è prima necessario stabilire cosa si intenda con pulire tutto il pavimento. Introducendo l'assunzione che la stanza sia rettangolare è possibile suddividerne la superficie in celle quadrate di dimensione fissa. Il lato delle celle dovrà essere di lunghezza non superiore al lato di dimensione maggiore del robot. Occorre quindi introdurre il concetto di basic step, ovvero un movimento che copra la distanza pari al lato della cella. Qualsiasi percorso del robot dovrà essere espresso come una sequenza di rotazioni di 90$^{\circ}$ e basic step. Al termine di un basic step la cella in cui il robot si trova è da considerarsi pulita. 
+
 Vengono di seguito riportati i modelli formali risultati dall'analisi dei requisiti:
 
 \lstinputlisting[label={lst:reqAnalysisRobot}]{../src/sprint5/req_analysis/reqAnalysisRobot.qa}
