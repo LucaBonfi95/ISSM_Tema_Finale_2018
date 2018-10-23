@@ -1,0 +1,199 @@
+System robot
+
+Event updateTemperature : updateTemperature(NAME, NEW_TEMP)
+Event updateTime		: updateTime(NAME, CURRENT_TIME)
+Event turnLed 			: turnLed(NAME, NEW_STATE)
+Event temperatureIsOk	: temperatureIsOk(STATE)
+Event timeIsOk	: timeIsOk(STATE)
+
+Event modelChanged 		: modelChanged(resource(NAME, STATE))
+
+// Emitted when A robot senses an obstacle (it can be the pfrs robot, the physical robot...)
+// VALUE is always true
+Event obstacleDetected : obstacleDetected(VALUE)
+
+// Emitted when A sonar senses something (unique sonars present are in pfrs environment)
+// VALUE is always true
+// DVALUE is the value of the distance of the object sensed
+Event sonarDetected : sonarDetected(name(NAME), somethingDetected(VALUE), distance(DVALUE))
+
+// Emitted when someone/thing modify the movement state of the robot
+// VALUE can be:
+// - stopped
+// - movingForward
+// - movingBackward
+// - turningLeft
+// - turningRight
+Event robotMovement : robotMovement(VALUE)
+
+// Like the Event. Used to turn the model-controller into an event-driven component
+Dispatch msg_obstacleDetected : obstacleDetected(VALUE)
+
+// Like the Event. Used to turn the model-controller into an event-driven component
+Dispatch msg_robotMovement : robotMovement(VALUE)
+
+
+
+// se si usa con il robot fisico al posto di localhost bisogna mettere l'indirizzo del pc
+Context ctxResourceModel ip[host="localhost" port=8099]
+
+
+// Mappers from Event to Dispatch. Used to turn the model into an event-driven component
+EventHandler evt_obstacle for obstacleDetected {//-pubsub {
+	forwardEvent resource_model_robot -m msg_obstacleDetected
+};
+EventHandler evt_robot for robotMovement {//-pubsub {
+	forwardEvent resource_model_robot -m msg_robotMovement
+};
+
+EventHandler logger for modelChanged, sonarDetected -print;
+
+QActor resource_model_led context ctxResourceModel {
+	
+	Plan init normal [
+		println("resource_model STARTED");
+		demo consult("resourceModel.pl")
+	]
+	switchTo waitForInputs
+	
+	Plan waitForInputs []
+	transition
+		stopAfter 1000000
+		whenEvent turnLed -> handleTurnLed
+	finally repeatPlan
+	
+	Plan handleTurnLed resumeLastPlan [
+		onEvent turnLed : turnLed(NAME, STATE) ->
+			demo changeModelItem(NAME, turnLed(STATE))
+	]
+	
+}
+
+QActor resource_model_time context ctxResourceModel {
+	
+	Rules {
+		minTime(7, 0, 0).
+		maxTime(9, 41, 0).
+		
+		changedModelAction(resource(name(timer), state(currentTime(CUR_H, CUR_M, CUR_S)))) :-
+ 			minTime(MIN_H, MIN_M, MIN_S),
+ 			maxTime(MAX_H, MAX_M, MAX_S), 
+ 			sec_tot(ST_CUR, CUR_H, CUR_M, CUR_S),
+ 			sec_tot(ST_MIN, MIN_H, MIN_M, MIN_S),
+ 			sec_tot(ST_MAX, MAX_H, MAX_M, MAX_S),
+ 			eval(ge, ST_CUR, ST_MIN),
+ 			eval(ge, ST_MAX, ST_CUR),
+ 			!,
+ 			changeModelItem(timeIsOk, true).
+ 		 
+ 		changedModelAction(resource(name(timer), state(currentTime(CUR_H, CUR_M, CUR_S)))) :-
+ 			changeModelItem(timeIsOk, false).
+	}
+	
+	Plan init normal [
+		println("resource_model STARTED");
+		demo consult("resourceModel.pl")
+	]
+	switchTo waitForInputs
+	
+	Plan waitForInputs []
+	transition
+		stopAfter 1000000
+		whenEvent updateTime -> handleUpdateTime
+	finally repeatPlan
+	
+	Plan handleUpdateTime resumeLastPlan [
+		onEvent updateTime : updateTime(timer, STATE) ->
+			demo changeModelItem(timer, updateTime(STATE))
+	]
+
+}
+
+QActor resource_model_temperature context ctxResourceModel {
+	
+	Rules {
+		limitTemperatureValue(25).
+		
+		changedModelAction(resource(name(temp), state(temperature(VALUE)))) :-
+				limitTemperatureValue(MAX),
+				eval(ge, MAX, VALUE), !,
+				changeModelItem(temperatureIsOk, true).
+				
+		changedModelAction(resource(name(temp), state(temperature(VALUE)))) :-
+				changeModelItem(temperatureIsOk, false).
+	}
+	
+	Plan init normal [
+		println("resource_model STARTED");
+		demo consult("resourceModel.pl")
+	]
+	switchTo waitForInputs
+	
+	Plan waitForInputs []
+	transition
+		stopAfter 1000000
+		whenEvent updateTemperature -> handleUpdateTemperature
+	finally repeatPlan
+	
+	Plan handleUpdateTemperature resumeLastPlan [
+		onEvent updateTemperature : updateTemperature(temp, STATE) ->
+			demo changeModelItem(temp, updateTemperature(STATE))
+	]
+}
+
+
+
+QActor resource_model_robot context ctxResourceModel {//-pubsub {
+	
+	Rules {
+		// It is needed to stop the chain of changedModelAction
+		changedModelAction(resource(name(robot), state(movement(stopped), obstacleDetected(true)))) :-
+			!.
+		// When an obstacle is sensed, stop the robot	
+		changedModelAction(resource(name(robot), state(X, obstacleDetected(true)))) :-
+			changeModelItem(robot, movement(stopped)).
+	}
+	
+	Plan init normal [
+		println("resource_model_robot STARTS");
+		demo consult("resourceModel.pl")
+	]
+	switchTo waitMsgs
+	
+	Plan waitMsgs []
+	transition
+		stopAfter 1000000
+		whenMsg msg_obstacleDetected -> handleObstacle,
+		whenMsg msg_robotMovement -> handleRobot
+	finally repeatPlan
+		
+	Plan handleObstacle resumeLastPlan [
+		onMsg msg_obstacleDetected : obstacleDetected(VALUE) -> 
+			demo changeModelItem(robot, obstacleDetected(VALUE))			
+	]
+	
+	Plan handleRobot resumeLastPlan [
+		onMsg msg_robotMovement : robotMovement(VALUE) -> 
+			demo changeModelItem(robot, movement(VALUE))
+	]
+}
+
+
+QActor resource_model_sonar context ctxResourceModel {
+	Plan init normal [
+		println("resource_model_sonar STARTS");
+		demo consult("resourceModel.pl")
+	]
+	switchTo waitForInputs
+	
+	Plan waitForInputs []
+	transition
+		stopAfter 6000000
+		whenEvent sonarDetected -> handleSonar
+	finally repeatPlan
+	
+	Plan handleSonar resumeLastPlan [
+		onEvent sonarDetected : sonarDetected(name(NAME), somethingDetected(VALUE), distance(DVALUE)) ->
+			demo changeModelItem(NAME, state(somethingDetected(VALUE), distance(DVALUE)))	
+	]
+} 

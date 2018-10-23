@@ -1,0 +1,26 @@
+/*
+*
+* A GraphViz DOT FSM description 
+* Please use a GraphViz visualizer (like http://www.webgraphviz.com)
+*  
+*/
+
+digraph finite_state_machine {
+	rankdir=LR
+	size="8,5"
+	
+	init [ color = red ][ fontcolor = red ][ penwidth = 3 ]
+	waitForMsgs [ color = black ][ fontcolor = black ][ penwidth = 3 ]
+	goodResultBasicStep [ color = black ][ fontcolor = black ][ penwidth = 3 ]
+	badResultBasicStep [ color = black ][ fontcolor = black ][ penwidth = 3 ]
+	handleBasicStep [ color = black ][ fontcolor = black ][ penwidth = 3 ]
+	handleRotation [ color = black ][ fontcolor = black ][ penwidth = 3 ]
+	
+	init -> waitForMsgs [ label = "switch" ][ color = black ][ fontcolor = black ]
+	waitForMsgs -> handleToutBuiltIn [ label = "timeout(1000000)" ][ color = green ][ fontcolor = green ]
+	handleBasicStep -> goodResultBasicStep [ label = "timeout(300)" ][ color = green ][ fontcolor = green ][ dir = both ]
+	waitForMsgs -> handleRotation [ label = "doRotation" ][ color = red ][ fontcolor = red ][ dir = both ]
+	handleBasicStep -> badResultBasicStep [ label = "foundObstacle" ][ color = red ][ fontcolor = red ][ dir = both ]
+	waitForMsgs -> handleBasicStep [ label = "doBasicStep" ][ color = red ][ fontcolor = red ][ dir = both ]
+	waitForMsgs -> waitForMsgs [ label = "repeat "][ style = dashed ][ color = blue ][ fontcolor = blue ]
+}

@@ -1,0 +1,134 @@
+System robot
+
+Event modelChanged : modelChanged(resource(NAME, STATE))
+Event timeCheck : timeCheck(SEC_TOT, HOURS, MINS, SECS)
+
+// Dispatch used to turn the pfrs robot into an event-driven component
+Dispatch msg_modelChanged : modelChanged(resource(NAME, STATE))
+
+// è il contesto del raspberry. bisogna mettere l'ip giusto.
+// a logica non dovrebbe essere qui, dovrebbe essere il raspberry che "si collega"
+// al resource model come abbiamo qui sotto.
+// facendo così invece non bisogna modifica ogni volta l'ip nel jar nel raspberry
+// commentando la riga si esclude il robot reale
+//Context ctxRealRobotAdapter ip[host="192.168.43.225" port=9010] -standalone 
+// questa invece per il led sul robot reale
+//Context ctxRealLedAdapter ip[host="192.168.43.225" port=9011] -standalone 
+
+// se si usa con il robot fisico al posto di localhost bisogna mettere l'indirizzo del pc
+Context ctxResourceModel ip[host="localhost" port=8099] -standalone 
+Context ctxOutput ip[host="localhost" port=8098]
+
+// It turns the pfrs robot into an event-driven component
+EventHandler pfrs_event_driven for modelChanged {
+	forwardEvent adapter_to_pfrs_mbot -m msg_modelChanged
+};
+
+
+QActor mock_output_led context ctxOutput {
+
+	Rules {
+		// rules needed by the application logic
+		ledName(led).
+	}
+	
+	
+	Plan init normal [
+		println("resource_representation_element STARTED");
+		javaRun it.unibo.custom.gui.customBlsGui.createCustomLedGui();
+		javaRun it.unibo.custom.gui.customBlsGui.setLed("off")
+	]
+	switchTo waitForModelChanged
+	
+	Plan waitForModelChanged []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> outputingData
+	finally
+		repeatPlan
+		
+	Plan outputingData resumeLastPlan [
+		[ !? ledName(NAME) ]
+			onEvent modelChanged : modelChanged(resource(name(NAME), state(on))) -> 
+				javaRun it.unibo.custom.gui.customBlsGui.setLed("on");
+		
+		[ !? ledName(NAME) ]
+			onEvent modelChanged : modelChanged(resource(name(NAME), state(off))) -> 
+				javaRun it.unibo.custom.gui.customBlsGui.setLed("off")
+	]
+	
+}
+
+QActor mock_output_temperature context ctxOutput -g green {
+	
+	Plan init normal [
+		println("Temperature Observer STARTED")
+	]
+	switchTo waitForEvents
+	
+	Plan waitForEvents []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> handleModelChanged
+	finally repeatPlan
+	
+	Plan handleModelChanged resumeLastPlan [
+		onEvent modelChanged : modelChanged(resource(name(temp), state(temperature(VALUE)))) ->
+			println(temp(VALUE))
+	]
+	
+}
+
+QActor mock_output_time context ctxOutput -g yellow {
+	
+	Plan init normal [
+		println("Timer Observer STARTED");
+		demo consult("resourceModel.pl")
+	]
+	switchTo waitForEvents
+	
+	Plan waitForEvents []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> handleModelChanged
+	finally repeatPlan
+	
+	Plan handleModelChanged resumeLastPlan [
+		onEvent modelChanged : modelChanged(resource(name(timer), state(currentTime(H, M, S)))) ->
+			println(now(H, M, S))
+	]
+	
+}
+
+
+// It makes pfrs robot a QActor entity.
+QActor adapter_to_pfrs_mbot context ctxOutput {//-pubsub {
+	
+	Plan init normal [
+		println("adapter_to_pfrs_mbot STARTS");
+		javaRun it.unibo.pfrs.mbotConnTcp.initClientConn()
+	]
+	switchTo waitMsgs
+	
+	Plan waitMsgs []
+	transition
+		stopAfter 1000000
+		whenMsg msg_modelChanged -> moveRobot
+	finally repeatPlan
+	
+	
+	Plan moveRobot resumeLastPlan [
+		onMsg msg_modelChanged : modelChanged(resource(name(robot), state(movement(stopped), X))) -> 
+				javaRun it.unibo.pfrs.mbotConnTcp.mbotStop();
+		onMsg msg_modelChanged : modelChanged(resource(name(robot), state(movement(movingForward), obstacleDetected(false)))) -> 
+				javaRun it.unibo.pfrs.mbotConnTcp.mbotForward();
+		onMsg msg_modelChanged : modelChanged(resource(name(robot), state(movement(movingBackward), X))) -> 
+				javaRun it.unibo.pfrs.mbotConnTcp.mbotBackward();
+		onMsg msg_modelChanged : modelChanged(resource(name(robot), state(movement(turningLeft), X))) -> 
+				javaRun it.unibo.pfrs.mbotConnTcp.mbotLeft();
+		onMsg msg_modelChanged : modelChanged(resource(name(robot), state(movement(turningRight), X))) -> 
+				javaRun it.unibo.pfrs.mbotConnTcp.mbotRight()
+	]
+	
+}
+//

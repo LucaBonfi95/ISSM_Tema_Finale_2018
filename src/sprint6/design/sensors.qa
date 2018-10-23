@@ -1,0 +1,106 @@
+System sensors
+
+Event updateTemperature : updateTemperature(NAME, NEW_TEMP)
+Event updateTime		: updateTime(NAME, CURRENT_TIME)
+
+Event modelChanged		: modelChanged(resource(NAME,STATE))
+
+Context ctxSensors ip[host="localhost"port=8099]
+
+QActor temperature_sensor_adapter context ctxSensors {
+	
+	Plan init normal [
+		println("resource_model STARTED");
+		delay 500
+	]
+	switchTo sendEvents
+	
+	Plan sendEvents [
+		delay 1000;
+		emit updateTemperature : updateTemperature(temp, 12)
+	]
+	finally repeatPlan
+	
+}
+
+QActor timer_adapter context ctxSensors {
+	
+	Plan init normal [
+		println("resource_model STARTED")
+	]
+	switchTo sendEvents
+	
+	Plan sendEvents [
+		delay 1000;
+		emit updateTime : updateTime(timer, currentTime(hours(132), minutes(23), seconds(213)))
+	]
+	finally repeatPlan
+	
+}
+
+QActor resource_model context ctxSensors {
+	
+	Plan init normal [
+		println("resource_model STARTED");
+		demo consult("resourceModel.pl")
+	]
+	switchTo waitForInputs
+	
+	Plan waitForInputs []
+	transition
+		stopAfter 1000000
+		whenEvent updateTemperature -> handleUpdateTemperature,
+		whenEvent updateTime 		-> handleUpdateTime
+	finally repeatPlan
+	
+	Plan handleUpdateTemperature resumeLastPlan [
+		onEvent updateTemperature : updateTemperature(temp, STATE) ->
+			demo changeModelItem(temp, updateTemperature(STATE))
+	]
+	
+	Plan handleUpdateTime resumeLastPlan [
+		onEvent updateTime : updateTime(timer, STATE) ->
+			demo changeModelItem(timer, updateTime(STATE))
+	]
+
+}
+
+QActor temperature_observer_mock context ctxSensors {
+	
+	Plan init normal [
+		println("Temperature Observer STARTED")
+	]
+	switchTo waitForEvents
+	
+	Plan waitForEvents []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> handleModelChanged
+	finally repeatPlan
+	
+	Plan handleModelChanged resumeLastPlan [
+		onEvent modelChanged : modelChanged(resource(name(temp), state(temperature(VALUE)))) ->
+			println(temp(VALUE))
+	]
+	
+}
+
+QActor timer_observer_mock context ctxSensors {
+	
+	Plan init normal [
+		println("Timer Observer STARTED")
+	]
+	switchTo waitForEvents
+	
+	Plan waitForEvents []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> handleModelChanged
+	finally repeatPlan
+	
+	Plan handleModelChanged resumeLastPlan [
+		onEvent modelChanged : modelChanged(resource(name(timer), state(currentTime(hours(H), minutes(M), seconds(S))))) ->
+			println(now(H,M,S))
+	]
+	
+}

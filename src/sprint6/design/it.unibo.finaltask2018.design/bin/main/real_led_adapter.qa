@@ -1,0 +1,37 @@
+System robot
+
+Event modelChanged : modelChanged(resource(NAME, STATE))
+
+Context ctxRealLedAdapter ip[host="localhost" port=9011]
+
+QActor real_led context ctxRealLedAdapter {
+
+	Rules {
+		// rules needed by the application logic
+		ledName(led).
+	}
+	
+	 
+	Plan init normal [
+		println("resource_representation_element STARTED")
+	]
+	switchTo waitForModelChanged
+	
+	Plan waitForModelChanged []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> outputingData
+	finally
+		repeatPlan
+		
+	Plan outputingData resumeLastPlan [
+		[ !? ledName(NAME) ]
+			onEvent modelChanged : modelChanged(resource(name(NAME), state(on))) -> 
+				javaRun it.unibo.myUtils.executor.execBash("./led28GpioTurnOn.sh");
+		
+		[ !? ledName(NAME) ]
+			onEvent modelChanged : modelChanged(resource(name(NAME), state(off))) -> 
+				javaRun it.unibo.myUtils.executor.execBash("./led28GpioTurnOff.sh")
+	]
+	
+}

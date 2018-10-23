@@ -1,0 +1,4 @@
+plan(1,init, sentence(true,move(print("resource_model STARTED")),'','' ))
+plan(2,init, sentence(true,move(solve,consult( "resourceModel.pl"),0,""),'','' ))
+plan(1,handleUpdateTemperature, sentence(true,eventswitch(updateTemperature, »updateTemperature( temp,STATE), move(solve,changeModelItem( temp,updateTemperature( STATE)),0,"") ),'','' ))
+plan(2,handleUpdateTemperature, sentence(true,move(resumeplan),'','' ))

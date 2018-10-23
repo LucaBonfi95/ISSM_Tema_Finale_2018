@@ -1,0 +1,8 @@
+plan(1,init, sentence(true,move(print("handle_planner STARTED")),'','' ))
+plan(2,init, sentence(true,not here StateMoveNormal,'','' ))
+plan(1,moveRobot, sentence(true,not here StateMoveNormal,'','' ))
+plan(2,moveRobot, sentence(-  move( n,w) ,forward(robot_basic_movements, doBasicStep,doBasicStep),'','' ))
+plan(3,moveRobot, sentence(-  move( ROT,w) ,not here StateMoveNormal,'','' ))
+plan(1,handleResult, sentence(true,eventswitch(basicStepResult, »basicStepResult( bad), not here StateMoveNormal ),'','' ))
+plan(2,handleResult, sentence(true,eventswitch(basicStepResult, »basicStepResult( good), not here StateMoveNormal ),'','' ))
+plan(3,handleResult, sentence(true,move(resumeplan),'','' ))

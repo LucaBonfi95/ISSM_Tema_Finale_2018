@@ -1,0 +1,6 @@
+plan(1,init, sentence(true,move(print("initial_conditions_checker STARTED")),'','' ))
+plan(1,checkEvent, sentence(true,eventswitch(modelChanged, »modelChanged( resource( name( temperatureIsOk),state( X))), not here  GuardMove ),'','' ))
+plan(2,checkEvent, sentence(true,eventswitch(modelChanged, »modelChanged( resource( name( timeIsOk),state( X))), not here  GuardMove ),'','' ))
+plan(3,checkEvent, sentence(true,move(resumeplan),'','' ))
+plan(1,checkConditions, sentence(true,eventswitch(userstart, »userstart( user), not here StateMoveNormal ),'','' ))
+plan(2,checkConditions, sentence(true,move(resumeplan),'','' ))

@@ -1,0 +1,3 @@
+plan(1,init, sentence(true,move(print("stop_conditions_checker STARTED")),'','' ))
+plan(1,stopRobot, sentence(true,eventswitch(userstop, »userstop( user), raise( robotMovement , robotMovement( stopped) )') ),'','' ))
+plan(2,stopRobot, sentence(true,move(resumeplan),'','' ))

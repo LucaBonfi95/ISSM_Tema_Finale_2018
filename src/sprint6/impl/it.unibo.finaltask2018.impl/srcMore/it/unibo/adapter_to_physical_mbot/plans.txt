@@ -1,0 +1,8 @@
+plan(1,init, sentence(true,not here StateMoveNormal,'','' ))
+plan(2,init, sentence(true,move(print("adapter_to_physical_mbot STARTS")),'','' ))
+plan(1,moveRobot, sentence(true,msgswitch(msg_modelChanged, modelChanged( resource( name( robot),state( movement( stopped),X))) , not here StateMoveNormal),'','' ))
+plan(2,moveRobot, sentence(true,msgswitch(msg_modelChanged, modelChanged( resource( name( robot),state( movement( movingForward),obstacleDetected( false)))) , not here StateMoveNormal),'','' ))
+plan(3,moveRobot, sentence(true,msgswitch(msg_modelChanged, modelChanged( resource( name( robot),state( movement( movingBackward),X))) , not here StateMoveNormal),'','' ))
+plan(4,moveRobot, sentence(true,msgswitch(msg_modelChanged, modelChanged( resource( name( robot),state( movement( turningLeft),X))) , not here StateMoveNormal),'','' ))
+plan(5,moveRobot, sentence(true,msgswitch(msg_modelChanged, modelChanged( resource( name( robot),state( movement( turningRight),X))) , not here StateMoveNormal),'','' ))
+plan(6,moveRobot, sentence(true,move(resumeplan),'','' ))

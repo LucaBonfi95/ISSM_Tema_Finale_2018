@@ -1,0 +1,80 @@
+System robot
+
+Event modelChanged : modelChanged(resource(NAME, STATE))
+
+Context ctxResourceModel ip[host="localhost" port=8099] -standalone 
+Context ctxOutput ip[host="localhost" port=8098]
+
+QActor mock_output_led context ctxOutput {
+
+	Rules {
+		// rules needed by the application logic
+		ledName(led).
+	}
+	
+	
+	Plan init normal [
+		println("resource_representation_element STARTED");
+		javaRun it.unibo.custom.gui.customBlsGui.createCustomLedGui()
+	]
+	switchTo waitForModelChanged
+	
+	Plan waitForModelChanged []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> outputingData
+	finally
+		repeatPlan
+		
+	Plan outputingData resumeLastPlan [
+		[ !? ledName(NAME) ]
+			onEvent modelChanged : modelChanged(resource(name(NAME), state(on))) -> 
+				javaRun it.unibo.custom.gui.customBlsGui.setLed("on");
+		
+		[ !? ledName(NAME) ]
+			onEvent modelChanged : modelChanged(resource(name(NAME), state(off))) -> 
+				javaRun it.unibo.custom.gui.customBlsGui.setLed("off")
+	]
+	
+}
+
+QActor mock_output_temperature context ctxOutput -g green {
+	
+	Plan init normal [
+		println("Temperature Observer STARTED")
+	]
+	switchTo waitForEvents
+	
+	Plan waitForEvents []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> handleModelChanged
+	finally repeatPlan
+	
+	Plan handleModelChanged resumeLastPlan [
+		onEvent modelChanged : modelChanged(resource(name(temp), state(temperature(VALUE)))) ->
+			println(temp(VALUE))
+	]
+	
+}
+
+QActor mock_output_time context ctxOutput -g yellow {
+	
+	Plan init normal [
+		println("Timer Observer STARTED")
+	]
+	switchTo waitForEvents
+	
+	Plan waitForEvents []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> handleModelChanged
+	finally repeatPlan
+	
+	Plan handleModelChanged resumeLastPlan [
+		onEvent modelChanged : modelChanged(resource(name(timer), state(currentTime(hours(H), minutes(M), seconds(S))))) ->
+			println(now(H,M,S))
+	]
+	
+}
+

@@ -1,0 +1,20 @@
+{
+	"robot": {
+		"movement" : "stopped",
+		"obstacleDetected": "false"
+	},
+	"temp": {
+		"temperature": 0
+	},
+	"led": {
+		"state": "off"
+	},
+	"sonar1": {
+		"somethingDetected": "false",
+		"distance": 0
+	},
+	"sonar2": {
+		"somethingDetected": "false",
+		"distance": 0
+	}
+}

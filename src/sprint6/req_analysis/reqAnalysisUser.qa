@@ -1,0 +1,38 @@
+System systemRobot
+
+Dispatch userCmd : userCmd(X)
+Event robotCmd : robotCmd(X)
+
+Context ctxRobot ip[host="localhost" port=5400] -standalone 
+Context ctxUser ip[host="localhost" port=5500] 
+
+QActor gui context ctxUser {
+	Plan initial normal [
+		println("Gui started")
+	] 
+	switchTo waitForMsg
+	
+	Plan waitForMsg [
+	]
+	transition stopAfter 600000
+		whenMsg userCmd -> handleMsg
+	finally repeatPlan
+	
+	Plan handleMsg resumeLastPlan [ 
+		println("Gui receives user message - User pressed button");
+		onMsg userCmd : userCmd(X) -> emit robotCmd : robotCmd(X)
+	]  
+}
+
+QActor user context ctxUser {
+	Plan initial normal [
+		println("User started")
+	]
+	switchTo sendMsg
+	
+	Plan sendMsg[
+		println("User send messages");
+		forward gui -m userCmd : userCmd(X);
+		forward gui -m userCmd : userCmd(Y)
+	]
+}
