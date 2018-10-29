@@ -1,8 +1,8 @@
 %====================================================================================
 % Context ctxFrontend  SYSTEM-configuration: file it.unibo.ctxFrontend.robot.pl 
 %====================================================================================
-context(ctxresourcemodel, "192.168.43.166",  "TCP", "8099" ).  		 
-context(ctxfrontend, "192.168.43.166",  "TCP", "8020" ).  		 
+context(ctxresourcemodel, "localhost",  "TCP", "8099" ).  		 
+context(ctxfrontend, "localhost",  "TCP", "8020" ).  		 
 %%% -------------------------------------------
 qactor( qa2frontend , ctxfrontend, "it.unibo.qa2frontend.MsgHandle_Qa2frontend"   ). %%store msgs 
 qactor( qa2frontend_ctrl , ctxfrontend, "it.unibo.qa2frontend.Qa2frontend"   ). %%control-driven 

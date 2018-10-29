@@ -56,6 +56,7 @@ public abstract class AbstractHandle_planner extends QActor {
 	    protected void initStateTable(){  	
 	    	stateTab.put("handleToutBuiltIn",handleToutBuiltIn);
 	    	stateTab.put("init",init);
+	    	stateTab.put("waitForStart",waitForStart);
 	    	stateTab.put("moveRobot",moveRobot);
 	    	stateTab.put("handleResult",handleResult);
 	    }
@@ -78,14 +79,30 @@ public abstract class AbstractHandle_planner extends QActor {
 	    	temporaryStr = "\"handle_planner STARTED\"";
 	    	println( temporaryStr );  
 	    	it.unibo.myPlannerIntegrator.myPlanner.init( myself  );
-	    	//switchTo moveRobot
+	    	//switchTo waitForStart
 	        switchToPlanAsNextState(pr, myselfName, "handle_planner_"+myselfName, 
-	              "moveRobot",false, false, null); 
+	              "waitForStart",false, false, null); 
 	    }catch(Exception e_init){  
 	    	 println( getName() + " plan=init WARNING:" + e_init.getMessage() );
 	    	 QActorContext.terminateQActorSystem(this); 
 	    }
 	    };//init
+	    
+	    StateFun waitForStart = () -> {	
+	    try{	
+	     PlanRepeat pr = PlanRepeat.setUp(getName()+"_waitForStart",0);
+	     pr.incNumIter(); 	
+	    	String myselfName = "waitForStart";  
+	    	//bbb
+	     msgTransition( pr,myselfName,"handle_planner_"+myselfName,false,
+	          new StateFun[]{stateTab.get("moveRobot") }, 
+	          new String[]{"true","E","startRobot" },
+	          1000000, "handleToutBuiltIn" );//msgTransition
+	    }catch(Exception e_waitForStart){  
+	    	 println( getName() + " plan=waitForStart WARNING:" + e_waitForStart.getMessage() );
+	    	 QActorContext.terminateQActorSystem(this); 
+	    }
+	    };//waitForStart
 	    
 	    StateFun moveRobot = () -> {	
 	    try{	
@@ -93,13 +110,25 @@ public abstract class AbstractHandle_planner extends QActor {
 	     pr.incNumIter(); 	
 	    	String myselfName = "moveRobot";  
 	    	it.unibo.myPlannerIntegrator.myPlanner.getMove( myself  );
+	    	if( (guardVars = QActorUtils.evalTheGuard(this, " ??move(n,n)" )) != null ){
+	    	temporaryStr = QActorUtils.unifyMsgContent(pengine,"noMoreMoves","noMoreMoves", guardVars ).toString();
+	    	sendMsg("noMoreMoves",getNameNoCtrl(), QActorContext.dispatch, temporaryStr ); 
+	    	}
 	    	if( (guardVars = QActorUtils.evalTheGuard(this, " ??move(n,w)" )) != null ){
 	    	temporaryStr = QActorUtils.unifyMsgContent(pengine,"doBasicStep","doBasicStep", guardVars ).toString();
 	    	sendMsg("doBasicStep","robot_basic_movements", QActorContext.dispatch, temporaryStr ); 
 	    	}
-	    	if( (guardVars = QActorUtils.evalTheGuard(this, " ??move(ROT,w)" )) != null ){
+	    	if( (guardVars = QActorUtils.evalTheGuard(this, " ??move(a,w)" )) != null ){
 	    	{//actionseq
-	    	temporaryStr = QActorUtils.unifyMsgContent(pengine,"doRotation(VALUE)","doRotation(ROT)", guardVars ).toString();
+	    	temporaryStr = QActorUtils.unifyMsgContent(pengine,"doRotation(VALUE)","doRotation(a)", guardVars ).toString();
+	    	sendMsg("doRotation","robot_basic_movements", QActorContext.dispatch, temporaryStr ); 
+	    	temporaryStr = QActorUtils.unifyMsgContent(pengine,"doBasicStep","doBasicStep", guardVars ).toString();
+	    	sendMsg("doBasicStep","robot_basic_movements", QActorContext.dispatch, temporaryStr ); 
+	    	};//actionseq
+	    	}
+	    	if( (guardVars = QActorUtils.evalTheGuard(this, " ??move(d,w)" )) != null ){
+	    	{//actionseq
+	    	temporaryStr = QActorUtils.unifyMsgContent(pengine,"doRotation(VALUE)","doRotation(d)", guardVars ).toString();
 	    	sendMsg("doRotation","robot_basic_movements", QActorContext.dispatch, temporaryStr ); 
 	    	temporaryStr = QActorUtils.unifyMsgContent(pengine,"doBasicStep","doBasicStep", guardVars ).toString();
 	    	sendMsg("doBasicStep","robot_basic_movements", QActorContext.dispatch, temporaryStr ); 
@@ -107,8 +136,8 @@ public abstract class AbstractHandle_planner extends QActor {
 	    	}
 	    	//bbb
 	     msgTransition( pr,myselfName,"handle_planner_"+myselfName,false,
-	          new StateFun[]{stateTab.get("handleResult") }, 
-	          new String[]{"true","E","basicStepResult" },
+	          new StateFun[]{stateTab.get("handleResult"), stateTab.get("waitForStart"), stateTab.get("waitForStart") }, 
+	          new String[]{"true","E","basicStepResult", "true","E","stopRobot", "true","M","noMoreMoves" },
 	          1000000, "handleToutBuiltIn" );//msgTransition
 	    }catch(Exception e_moveRobot){  
 	    	 println( getName() + " plan=moveRobot WARNING:" + e_moveRobot.getMessage() );

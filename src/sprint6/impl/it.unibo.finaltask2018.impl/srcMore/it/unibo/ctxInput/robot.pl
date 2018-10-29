@@ -1,8 +1,8 @@
 %====================================================================================
 % Context ctxInput  SYSTEM-configuration: file it.unibo.ctxInput.robot.pl 
 %====================================================================================
-context(ctxresourcemodel, "192.168.43.166",  "TCP", "8099" ).  		 
-context(ctxinput, "192.168.43.166",  "TCP", "8096" ).  		 
+context(ctxresourcemodel, "localhost",  "TCP", "8099" ).  		 
+context(ctxinput, "localhost",  "TCP", "8096" ).  		 
 %%% -------------------------------------------
 qactor( temperature_sensor_adapter , ctxinput, "it.unibo.temperature_sensor_adapter.MsgHandle_Temperature_sensor_adapter"   ). %%store msgs 
 qactor( temperature_sensor_adapter_ctrl , ctxinput, "it.unibo.temperature_sensor_adapter.Temperature_sensor_adapter"   ). %%control-driven 

@@ -12,8 +12,8 @@ digraph finite_state_machine {
 	init [ color = red ][ fontcolor = red ][ penwidth = 3 ]
 	handleSonar [ color = black ][ fontcolor = black ][ penwidth = 3 ]
 	waitForEvents [ color = black ][ fontcolor = black ][ penwidth = 3 ]
+	init [ color = blue ][ fontcolor = blue ][ penwidth = 3 ]
 	
-	init -> waitForEvents [ label = "switch" ][ color = black ][ fontcolor = black ]
 	waitForEvents -> handleToutBuiltIn [ label = "timeout(1000000)" ][ color = green ][ fontcolor = green ]
 	waitForEvents -> waitForEvents [ label = "repeat "][ style = dashed ][ color = blue ][ fontcolor = blue ]
 	waitForEvents -> handleSonar [ label = "modelChanged" ][ color = red ][ fontcolor = red ][ dir = both ]

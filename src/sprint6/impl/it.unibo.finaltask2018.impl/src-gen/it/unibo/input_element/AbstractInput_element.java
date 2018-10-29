@@ -76,9 +76,7 @@ public abstract class AbstractInput_element extends QActor {
 	    	String myselfName = "init";  
 	    	temporaryStr = "\"input_element STARTED\"";
 	    	println( temporaryStr );  
-	    	//switchTo working
-	        switchToPlanAsNextState(pr, myselfName, "input_element_"+myselfName, 
-	              "working",false, false, null); 
+	    	repeatPlanNoTransition(pr,myselfName,"input_element_"+myselfName,false,false);
 	    }catch(Exception e_init){  
 	    	 println( getName() + " plan=init WARNING:" + e_init.getMessage() );
 	    	 QActorContext.terminateQActorSystem(this); 

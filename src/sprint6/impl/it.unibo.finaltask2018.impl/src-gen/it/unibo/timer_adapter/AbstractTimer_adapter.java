@@ -76,7 +76,9 @@ public abstract class AbstractTimer_adapter extends QActor {
 	    	String myselfName = "init";  
 	    	temporaryStr = "\"resource_model STARTED\"";
 	    	println( temporaryStr );  
-	    	repeatPlanNoTransition(pr,myselfName,"timer_adapter_"+myselfName,false,false);
+	    	//switchTo sendEvents
+	        switchToPlanAsNextState(pr, myselfName, "timer_adapter_"+myselfName, 
+	              "sendEvents",false, false, null); 
 	    }catch(Exception e_init){  
 	    	 println( getName() + " plan=init WARNING:" + e_init.getMessage() );
 	    	 QActorContext.terminateQActorSystem(this); 
@@ -92,7 +94,8 @@ public abstract class AbstractTimer_adapter extends QActor {
 	    	aar = delayReactive(1000,"" , "");
 	    	if( aar.getInterrupted() ) curPlanInExec   = "sendEvents";
 	    	if( ! aar.getGoon() ) return ;
-	    	it.unibo.timer_adapter.systemTimerAdapter.updateTime( myself  );
+	    	temporaryStr = QActorUtils.unifyMsgContent(pengine, "updateTime(NAME,CURRENT_TIME)","updateTime(timer,currentTime(8,0,0))", guardVars ).toString();
+	    	emit( "updateTime", temporaryStr );
 	    	repeatPlanNoTransition(pr,myselfName,"timer_adapter_"+myselfName,true,false);
 	    }catch(Exception e_sendEvents){  
 	    	 println( getName() + " plan=sendEvents WARNING:" + e_sendEvents.getMessage() );

@@ -94,8 +94,8 @@ public abstract class AbstractInitial_conditions_checker extends QActor {
 	    	String myselfName = "waitForEvents";  
 	    	//bbb
 	     msgTransition( pr,myselfName,"initial_conditions_checker_"+myselfName,false,
-	          new StateFun[]{stateTab.get("checkConditions") }, 
-	          new String[]{"true","E","userstart" },
+	          new StateFun[]{stateTab.get("checkEvent"), stateTab.get("checkConditions") }, 
+	          new String[]{"true","E","modelChanged", "true","E","userstart" },
 	          1000000, "handleToutBuiltIn" );//msgTransition
 	    }catch(Exception e_waitForEvents){  
 	    	 println( getName() + " plan=waitForEvents WARNING:" + e_waitForEvents.getMessage() );
@@ -157,8 +157,8 @@ public abstract class AbstractInitial_conditions_checker extends QActor {
 	    			//println("WARNING: variable substitution not yet fully implemented " ); 
 	    			{//actionseq
 	    			if( (guardVars = QActorUtils.evalTheGuard(this, " !?startRequirementsOk" )) != null ){
-	    			temporaryStr = QActorUtils.unifyMsgContent(pengine, "robotMovement(VALUE)","robotMovement(movingForward)", guardVars ).toString();
-	    			emit( "robotMovement", temporaryStr );
+	    			temporaryStr = QActorUtils.unifyMsgContent(pengine, "startRobot","startRobot", guardVars ).toString();
+	    			emit( "startRobot", temporaryStr );
 	    			}
 	    			};//actionseq
 	    	}

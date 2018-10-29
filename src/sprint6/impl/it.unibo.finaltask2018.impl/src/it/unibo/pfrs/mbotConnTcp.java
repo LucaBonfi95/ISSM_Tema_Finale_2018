@@ -90,6 +90,7 @@ public class mbotConnTcp {
 						//curActor.println("from json: " + event.toString());
 						if(event.getString("type").equals("collision")) {
 							//emit the event obstacleDetected : obstacleDetected(true)
+							//System.out.println(curActor.getPrologEngine().getTheory().toString());
 							QActorUtils.raiseEvent(curActor, "pfrs_mbot", "obstacleDetected", "obstacleDetected(true)");
 							mbotStop(curActor);
 							//Added to avoid the state obstacleDetected remains

@@ -108,15 +108,39 @@ public abstract class AbstractStop_conditions_checker extends QActor {
 	    	String myselfName = "stopRobot";  
 	    	//onEvent 
 	    	setCurrentMsgFromStore(); 
+	    	curT = Term.createTerm("modelChanged(resource(name(temperatureIsOk),state(false)))");
+	    	if( currentEvent != null && currentEvent.getEventId().equals("modelChanged") && 
+	    		pengine.unify(curT, Term.createTerm("modelChanged(resource(NAME,STATE))")) && 
+	    		pengine.unify(curT, Term.createTerm( currentEvent.getMsg() ) )){ 
+	    			String parg="stopRobot";
+	    			/* RaiseEvent */
+	    			parg = updateVars(Term.createTerm("modelChanged(resource(NAME,STATE))"),  Term.createTerm("modelChanged(resource(name(temperatureIsOk),state(false)))"), 
+	    				    		  					Term.createTerm(currentEvent.getMsg()), parg);
+	    			if( parg != null ) emit( "stopRobot", parg );
+	    	}
+	    	//onEvent 
+	    	setCurrentMsgFromStore(); 
+	    	curT = Term.createTerm("modelChanged(resource(name(timeIsOk),state(false)))");
+	    	if( currentEvent != null && currentEvent.getEventId().equals("modelChanged") && 
+	    		pengine.unify(curT, Term.createTerm("modelChanged(resource(NAME,STATE))")) && 
+	    		pengine.unify(curT, Term.createTerm( currentEvent.getMsg() ) )){ 
+	    			String parg="stopRobot";
+	    			/* RaiseEvent */
+	    			parg = updateVars(Term.createTerm("modelChanged(resource(NAME,STATE))"),  Term.createTerm("modelChanged(resource(name(timeIsOk),state(false)))"), 
+	    				    		  					Term.createTerm(currentEvent.getMsg()), parg);
+	    			if( parg != null ) emit( "stopRobot", parg );
+	    	}
+	    	//onEvent 
+	    	setCurrentMsgFromStore(); 
 	    	curT = Term.createTerm("userstop(user)");
 	    	if( currentEvent != null && currentEvent.getEventId().equals("userstop") && 
 	    		pengine.unify(curT, Term.createTerm("userstop(X)")) && 
 	    		pengine.unify(curT, Term.createTerm( currentEvent.getMsg() ) )){ 
-	    			String parg="robotMovement(stopped)";
+	    			String parg="stopRobot";
 	    			/* RaiseEvent */
 	    			parg = updateVars(Term.createTerm("userstop(X)"),  Term.createTerm("userstop(user)"), 
 	    				    		  					Term.createTerm(currentEvent.getMsg()), parg);
-	    			if( parg != null ) emit( "robotMovement", parg );
+	    			if( parg != null ) emit( "stopRobot", parg );
 	    	}
 	    	repeatPlanNoTransition(pr,myselfName,"stop_conditions_checker_"+myselfName,false,true);
 	    }catch(Exception e_stopRobot){  

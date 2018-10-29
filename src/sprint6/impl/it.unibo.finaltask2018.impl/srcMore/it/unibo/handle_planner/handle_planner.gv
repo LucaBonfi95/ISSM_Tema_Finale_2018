@@ -12,9 +12,15 @@ digraph finite_state_machine {
 	init [ color = red ][ fontcolor = red ][ penwidth = 3 ]
 	handleResult [ color = black ][ fontcolor = black ][ penwidth = 3 ]
 	moveRobot [ color = black ][ fontcolor = black ][ penwidth = 3 ]
+	waitForStart [ color = black ][ fontcolor = black ][ penwidth = 3 ]
 	
+	moveRobot -> waitForStart [ label = "stopRobot" ][ color = black ][ fontcolor = black ]
+	waitForStart -> handleToutBuiltIn [ label = "timeout(1000000)" ][ color = green ][ fontcolor = green ]
 	moveRobot -> moveRobot [ label = "repeat "][ style = dashed ][ color = blue ][ fontcolor = blue ]
-	init -> moveRobot [ label = "switch" ][ color = black ][ fontcolor = black ]
 	moveRobot -> handleToutBuiltIn [ label = "timeout(1000000)" ][ color = green ][ fontcolor = green ]
+	waitForStart -> moveRobot [ label = "startRobot" ][ color = black ][ fontcolor = black ]
+	moveRobot -> waitForStart [ label = "noMoreMoves" ][ color = black ][ fontcolor = black ]
+	waitForStart -> waitForStart [ label = "repeat "][ style = dashed ][ color = blue ][ fontcolor = blue ]
+	init -> waitForStart [ label = "switch" ][ color = black ][ fontcolor = black ]
 	moveRobot -> handleResult [ label = "basicStepResult" ][ color = red ][ fontcolor = red ][ dir = both ]
 }

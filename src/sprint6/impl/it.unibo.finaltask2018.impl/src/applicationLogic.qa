@@ -21,6 +21,8 @@ Event basicStepResult	: basicStepResult(VALUE)
 Event startRobot		: startRobot
 Event stopRobot			: stopRobot
 
+Dispatch noMoreMoves	: noMoreMoves
+
 
 // se si usa con il robot fisico al posto di localhost bisogna mettere l'indirizzo del pc
 Context ctxResourceModel ip[host="localhost" port=8099] -standalone 
@@ -113,7 +115,7 @@ QActor initial_conditions_checker context ctxApplicationLogic {
 	Plan waitForEvents []
 	transition
 		stopAfter 1000000
-		//whenEvent modelChanged -> checkEvent,
+		whenEvent modelChanged -> checkEvent,
 		whenEvent userstart -> checkConditions
 	finally
 		repeatPlan
@@ -157,7 +159,7 @@ QActor sonar_checker context ctxApplicationLogic {
 	Plan init normal [
 		println("sonar_checker STARTED")
 	]
-	switchTo waitForEvents
+	//switchTo waitForEvents
 	
 	Plan waitForEvents []
 	transition
@@ -261,6 +263,8 @@ QActor handle_planner context ctxApplicationLogic {
 		// move(X,Y): 
 		// X = rotation (n = none, a = left, d = right); 
 		// Y = move (n = none, w = forward)
+		[?? move(n,n)]
+			selfMsg noMoreMoves : noMoreMoves;
 		[?? move(n,w)] 
 			forward robot_basic_movements -m doBasicStep : doBasicStep;
 		[?? move(a,w)] {
@@ -275,7 +279,8 @@ QActor handle_planner context ctxApplicationLogic {
 	transition
 		stopAfter 1000000
 		whenEvent basicStepResult -> handleResult,
-		whenEvent stopRobot -> waitForStart
+		whenEvent stopRobot -> waitForStart,
+		whenMsg noMoreMoves -> waitForStart
 	finally
 		repeatPlan
 		

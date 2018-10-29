@@ -26,7 +26,10 @@ public class myPlanner {
 		try {
 			List<Action> actions = aiutil.doPlan();
 			lastMove = actions;
-			if(actions.size() == 1) {
+			if(actions == null) {				
+				actor.addRule("move(n,n)");
+			}
+			else if(actions.size() == 1) {
 				//move(X, Y)
 				//X --> a is right
 				//		d is left
@@ -43,6 +46,11 @@ public class myPlanner {
 				//else
 					//actor.addRule("move(" + m2 +"," + m1 + ")");
 			}
+			
+			System.out.println("\n--------------------------\nThe move is: " + actions);
+			aiutil.showMap();
+			System.out.println("\n--------------------------");
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

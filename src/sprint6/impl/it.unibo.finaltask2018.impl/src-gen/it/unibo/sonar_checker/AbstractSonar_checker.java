@@ -77,9 +77,7 @@ public abstract class AbstractSonar_checker extends QActor {
 	    	String myselfName = "init";  
 	    	temporaryStr = "\"sonar_checker STARTED\"";
 	    	println( temporaryStr );  
-	    	//switchTo waitForEvents
-	        switchToPlanAsNextState(pr, myselfName, "sonar_checker_"+myselfName, 
-	              "waitForEvents",false, false, null); 
+	    	repeatPlanNoTransition(pr,myselfName,"sonar_checker_"+myselfName,false,false);
 	    }catch(Exception e_init){  
 	    	 println( getName() + " plan=init WARNING:" + e_init.getMessage() );
 	    	 QActorContext.terminateQActorSystem(this); 
@@ -121,18 +119,6 @@ public abstract class AbstractSonar_checker extends QActor {
 	    	//onEvent 
 	    	setCurrentMsgFromStore(); 
 	    	curT = Term.createTerm("modelChanged(resource(name(sonar2),state(somethingDetected(true),_)))");
-	    	if( currentEvent != null && currentEvent.getEventId().equals("modelChanged") && 
-	    		pengine.unify(curT, Term.createTerm("modelChanged(resource(NAME,STATE))")) && 
-	    		pengine.unify(curT, Term.createTerm( currentEvent.getMsg() ) )){ 
-	    			//println("WARNING: variable substitution not yet fully implemented " ); 
-	    			//delay  ( no more reactive within a plan)
-	    			aar = delayReactive(1000,"" , "");
-	    			if( aar.getInterrupted() ) curPlanInExec   = "handleSonar";
-	    			if( ! aar.getGoon() ) return ;
-	    	}
-	    	//onEvent 
-	    	setCurrentMsgFromStore(); 
-	    	curT = Term.createTerm("modelChanged(resource(name(robot),state(movement(stopped),obstacleDetected(true))))");
 	    	if( currentEvent != null && currentEvent.getEventId().equals("modelChanged") && 
 	    		pengine.unify(curT, Term.createTerm("modelChanged(resource(NAME,STATE))")) && 
 	    		pengine.unify(curT, Term.createTerm( currentEvent.getMsg() ) )){ 

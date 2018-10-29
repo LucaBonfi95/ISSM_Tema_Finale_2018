@@ -17,5 +17,6 @@ digraph finite_state_machine {
 	waitForEvents -> checkConditions [ label = "userstart" ][ color = red ][ fontcolor = red ][ dir = both ]
 	init -> waitForEvents [ label = "switch" ][ color = black ][ fontcolor = black ]
 	waitForEvents -> handleToutBuiltIn [ label = "timeout(1000000)" ][ color = green ][ fontcolor = green ]
+	waitForEvents -> checkEvent [ label = "modelChanged" ][ color = red ][ fontcolor = red ][ dir = both ]
 	waitForEvents -> waitForEvents [ label = "repeat "][ style = dashed ][ color = blue ][ fontcolor = blue ]
 }

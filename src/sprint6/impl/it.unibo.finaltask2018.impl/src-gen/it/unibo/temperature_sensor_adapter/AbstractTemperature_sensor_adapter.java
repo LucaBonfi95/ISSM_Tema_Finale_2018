@@ -81,7 +81,9 @@ public abstract class AbstractTemperature_sensor_adapter extends QActor {
 	    	aar = delayReactive(500,"" , "");
 	    	if( aar.getInterrupted() ) curPlanInExec   = "init";
 	    	if( ! aar.getGoon() ) return ;
-	    	repeatPlanNoTransition(pr,myselfName,"temperature_sensor_adapter_"+myselfName,false,false);
+	    	//switchTo sendEvents
+	        switchToPlanAsNextState(pr, myselfName, "temperature_sensor_adapter_"+myselfName, 
+	              "sendEvents",false, false, null); 
 	    }catch(Exception e_init){  
 	    	 println( getName() + " plan=init WARNING:" + e_init.getMessage() );
 	    	 QActorContext.terminateQActorSystem(this); 
@@ -94,10 +96,11 @@ public abstract class AbstractTemperature_sensor_adapter extends QActor {
 	     pr.incNumIter(); 	
 	    	String myselfName = "sendEvents";  
 	    	//delay  ( no more reactive within a plan)
-	    	aar = delayReactive(10000,"" , "");
+	    	aar = delayReactive(1000,"" , "");
 	    	if( aar.getInterrupted() ) curPlanInExec   = "sendEvents";
 	    	if( ! aar.getGoon() ) return ;
-	    	it.unibo.temperature_sensor_adapter.webTemperatureSensorAdapter.updateTemperature( myself  );
+	    	temporaryStr = QActorUtils.unifyMsgContent(pengine, "updateTemperature(NAME,NEW_TEMP)","updateTemperature(temp,12)", guardVars ).toString();
+	    	emit( "updateTemperature", temporaryStr );
 	    	repeatPlanNoTransition(pr,myselfName,"temperature_sensor_adapter_"+myselfName,true,false);
 	    }catch(Exception e_sendEvents){  
 	    	 println( getName() + " plan=sendEvents WARNING:" + e_sendEvents.getMessage() );

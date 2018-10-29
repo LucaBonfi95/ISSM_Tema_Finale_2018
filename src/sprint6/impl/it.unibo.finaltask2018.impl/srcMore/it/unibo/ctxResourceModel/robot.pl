@@ -16,6 +16,6 @@ qactor( resource_model_sonar_ctrl , ctxresourcemodel, "it.unibo.resource_model_s
 %%% -------------------------------------------
 eventhandler(evt_obstacle,ctxresourcemodel,"it.unibo.ctxResourceModel.Evt_obstacle","obstacleDetected").  
 eventhandler(evt_robot,ctxresourcemodel,"it.unibo.ctxResourceModel.Evt_robot","robotMovement").  
-eventhandler(logger,ctxresourcemodel,"it.unibo.ctxResourceModel.Logger","modelChanged,sonarDetected").  
+eventhandler(logger,ctxresourcemodel,"it.unibo.ctxResourceModel.Logger","modelChanged").  
 %%% -------------------------------------------
 

@@ -10,7 +10,7 @@ digraph finite_state_machine {
 	size="8,5"
 	
 	init [ color = red ][ fontcolor = red ][ penwidth = 3 ]
+	init [ color = blue ][ fontcolor = blue ][ penwidth = 3 ]
 	working [ color = blue ][ fontcolor = blue ][ penwidth = 3 ]
 	
-	init -> working [ label = "switch" ][ color = black ][ fontcolor = black ]
 }

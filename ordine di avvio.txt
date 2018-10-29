@@ -1,0 +1,6 @@
+1. far partire scenaSoffritti
+2. far partire docker
+	2.1. far partire mongodb
+	2.2. far partire mosquitto
+3. far partire il file nel progetto auth/frontendServer.js
+4. far partire in ordine l'applicazione QActor
