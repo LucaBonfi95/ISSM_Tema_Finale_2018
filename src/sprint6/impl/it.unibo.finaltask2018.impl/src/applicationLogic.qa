@@ -18,6 +18,9 @@ Dispatch foundObstacle	: foundObstacle
 
 Event basicStepResult	: basicStepResult(VALUE)
 
+Event startRobot		: startRobot
+Event stopRobot			: stopRobot
+
 
 // se si usa con il robot fisico al posto di localhost bisogna mettere l'indirizzo del pc
 Context ctxResourceModel ip[host="localhost" port=8099] -standalone 
@@ -123,8 +126,7 @@ QActor initial_conditions_checker context ctxApplicationLogic {
 	Plan checkConditions resumeLastPlan [
 		onEvent userstart : userstart(user) -> {
 			[ !? startRequirementsOk ] 
-				//delay 1000 //TODO interagisce con classe Java che si occupa di muovere il robot
-				emit robotMovement : robotMovement(movingForward)
+				emit startRobot : startRobot
 		}
 	]
 	
@@ -145,10 +147,9 @@ QActor stop_conditions_checker context ctxApplicationLogic {
 		repeatPlan
 	
 	Plan stopRobot resumeLastPlan [
-		//onEvent modelChanged : modelChanged(resource(name(temperatureIsOk), state(false))) -> delay 1000; //TODO interagisce con classe Java che si occupa di muovere il robot
-		//onEvent modelChanged : modelChanged(resource(name(timeIsOk), state(false))) -> delay 1000; //TODO interagisce con classe Java che si occupa di muovere il robot
-		onEvent userstop : userstop(user) -> //delay 1000 //TODO interagisce con classe Java che si occupa di muovere il robot
-			emit robotMovement : robotMovement(stopped)
+		onEvent modelChanged : modelChanged(resource(name(temperatureIsOk), state(false))) -> emit stopRobot : stopRobot;
+		onEvent modelChanged : modelChanged(resource(name(timeIsOk), state(false))) -> emit stopRobot : stopRobot;
+		onEvent userstop : userstop(user) -> emit stopRobot : stopRobot
 	]
 }
 
@@ -167,8 +168,7 @@ QActor sonar_checker context ctxApplicationLogic {
 		
 	Plan handleSonar resumeLastPlan [
 		onEvent modelChanged : modelChanged(resource(name(sonar1), state(somethingDetected(true), _))) -> delay 1000; //TODO interagisce con classe Java che si occupa di muovere il robot
-		onEvent modelChanged : modelChanged(resource(name(sonar2), state(somethingDetected(true), _))) -> delay 1000; //TODO interagisce con classe Java che si occupa di muovere il robot
-		onEvent modelChanged : modelChanged(resource(name(robot), state(movement(stopped), obstacleDetected(true)))) -> delay 1000 //TODO interagisce con classe Java che si occupa di muovere il robot
+		onEvent modelChanged : modelChanged(resource(name(sonar2), state(somethingDetected(true), _))) -> delay 1000 //TODO interagisce con classe Java che si occupa di muovere il robot
 	]
 }
 
@@ -245,7 +245,15 @@ QActor handle_planner context ctxApplicationLogic {
 		println("handle_planner STARTED");
 		javaRun it.unibo.myPlannerIntegrator.myPlanner.init()
 	]
-	switchTo moveRobot
+	switchTo waitForStart
+	
+	Plan waitForStart [
+	]
+	transition 
+		stopAfter 1000000
+		whenEvent startRobot -> moveRobot
+	finally
+		repeatPlan
 	
 	Plan moveRobot [
 		javaRun it.unibo.myPlannerIntegrator.myPlanner.getMove();
@@ -255,14 +263,19 @@ QActor handle_planner context ctxApplicationLogic {
 		// Y = move (n = none, w = forward)
 		[?? move(n,w)] 
 			forward robot_basic_movements -m doBasicStep : doBasicStep;
-		[?? move(ROT,w)] {
-			forward robot_basic_movements -m doRotation : doRotation(ROT);
+		[?? move(a,w)] {
+			forward robot_basic_movements -m doRotation : doRotation(a);
+			forward robot_basic_movements -m doBasicStep : doBasicStep
+		};
+		[?? move(d,w)] {
+			forward robot_basic_movements -m doRotation : doRotation(d);
 			forward robot_basic_movements -m doBasicStep : doBasicStep
 		}
 	]
 	transition
 		stopAfter 1000000
-		whenEvent basicStepResult -> handleResult
+		whenEvent basicStepResult -> handleResult,
+		whenEvent stopRobot -> waitForStart
 	finally
 		repeatPlan
 		
@@ -272,6 +285,7 @@ QActor handle_planner context ctxApplicationLogic {
 		onEvent basicStepResult : basicStepResult(good) ->
 			javaRun it.unibo.myPlannerIntegrator.myPlanner.setMoveResult("good")
 	]
+	
 }
 
 
