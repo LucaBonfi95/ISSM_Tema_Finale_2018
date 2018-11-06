@@ -18,6 +18,8 @@ public class mbotConnTcp {
 	
 	private static QActor curActor;
 	
+	private static boolean turning = false;
+	
 	public mbotConnTcp() {
 //		try {
 //			initClientConn();
@@ -59,18 +61,23 @@ public class mbotConnTcp {
  	
 	public static void mbotForward(QActor actor) {
  		try {  sendCmd("moveForward", "-1"); } catch (Exception e) {e.printStackTrace();}
+ 		turning = false;
 	}
 	public static void mbotBackward(QActor actor) {
 		try { sendCmd("moveBackward", "-1"); } catch (Exception e) {e.printStackTrace();}
+		turning = false;
 	}
 	public static void mbotLeft(QActor actor) {
 		try { sendCmd("alarm", "-1"); sendCmd("turnLeft", "800"); } catch (Exception e) {e.printStackTrace();}
+		turning = true;
 	}
 	public static void mbotRight(QActor actor) {
 		try { sendCmd("alarm", "-1"); sendCmd("turnRight", "800"); } catch (Exception e) {e.printStackTrace();}
+		turning = true;
 	}
 	public static void mbotStop(QActor actor) {
 		try { sendCmd("alarm", "-1"); } catch (Exception e) {e.printStackTrace();}
+		turning = false;
 	}
   	
 	
@@ -88,10 +95,11 @@ public class mbotConnTcp {
 						//curActor.println("string: " + eventStr);
 						JSONObject event = new JSONObject(eventStr);
 						//curActor.println("from json: " + event.toString());
-						if(event.getString("type").equals("collision")) {
+						if(event.getString("type").equals("collision") && !turning) {
 							//emit the event obstacleDetected : obstacleDetected(true)
 							//System.out.println(curActor.getPrologEngine().getTheory().toString());
 							QActorUtils.raiseEvent(curActor, "pfrs_mbot", "obstacleDetected", "obstacleDetected(true)");
+							System.out.println("+++EVENTO COLLISION+++");
 							mbotStop(curActor);
 							//Added to avoid the state obstacleDetected remains
 							Thread.sleep(200);

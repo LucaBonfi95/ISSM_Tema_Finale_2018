@@ -47,7 +47,7 @@ public class myPlanner {
 					//actor.addRule("move(" + m2 +"," + m1 + ")");
 			}
 			
-			System.out.println("\n--------------------------\nThe move is: " + actions);
+			System.out.println("\n--------------------------\nThe next move is: " + actions);
 			aiutil.showMap();
 			System.out.println("\n--------------------------");
 			
@@ -61,9 +61,11 @@ public class myPlanner {
 		try {
 			if(result.equalsIgnoreCase("good"))
 				executeMoves(lastMove);
-			else {
+			else if(result.equalsIgnoreCase("bad")) {
+
 				if(lastMove.size() == 2)
 					aiutil.doMove(lastMove.get(0).toString());
+				
 				switch (aiutil.initialState.getDirection()) {
 				case RIGHT:
 					aiutil.doMove("obstacleOnRight");
@@ -78,6 +80,8 @@ public class myPlanner {
 					aiutil.doMove("obstacleOnDown");
 					break;
 				}
+				
+				
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

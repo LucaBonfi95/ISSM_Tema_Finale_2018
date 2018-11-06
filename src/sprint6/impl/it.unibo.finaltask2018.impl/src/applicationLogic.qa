@@ -23,6 +23,8 @@ Event stopRobot			: stopRobot
 
 Dispatch noMoreMoves	: noMoreMoves
 
+Event obstacleDetected	: obstacleDetected(VALUE)
+
 
 // se si usa con il robot fisico al posto di localhost bisogna mettere l'indirizzo del pc
 Context ctxResourceModel ip[host="localhost" port=8099] -standalone 
@@ -189,7 +191,8 @@ QActor robot_basic_movements context ctxApplicationLogic {
 		repeatPlan
 	
 	Plan handleBasicStep resumeLastPlan [
-		emit robotMovement : robotMovement(movingForward)
+		emit robotMovement : robotMovement(movingForward);
+		println("+++Starting basic step+++")
 	]
 	transition
 		whenTime 300 -> goodResultBasicStep,
@@ -233,11 +236,13 @@ QActor collision_detector context ctxApplicationLogic {
 	transition
 		stopAfter 1000000
 		whenEvent modelChanged -> handleSonar
+//		whenEvent obstacleDetected -> handleSonar
 	finally
 		repeatPlan
 		
 	Plan handleSonar resumeLastPlan [
-		onEvent modelChanged : modelChanged(resource(name(robot), state(movement(stopped), obstacleDetected(true)))) -> 
+		onEvent modelChanged : modelChanged(resource(name(robot), state(movement(stopped), obstacleDetected(true)))) ->
+//		onEvent obstacleDetected : obstacleDetected(true) -> 
 			forward robot_basic_movements -m foundObstacle : foundObstacle
 	]
 }
@@ -258,6 +263,7 @@ QActor handle_planner context ctxApplicationLogic {
 		repeatPlan
 	
 	Plan moveRobot [
+		delay 1000;
 		javaRun it.unibo.myPlannerIntegrator.myPlanner.getMove();
 		// move = basicStep or 90 degree rotation + basicStep
 		// move(X,Y): 
@@ -265,15 +271,21 @@ QActor handle_planner context ctxApplicationLogic {
 		// Y = move (n = none, w = forward)
 		[?? move(n,n)]
 			selfMsg noMoreMoves : noMoreMoves;
-		[?? move(n,w)] 
+		[?? move(n,w)]{ 
 			forward robot_basic_movements -m doBasicStep : doBasicStep;
+			println("+++move(n,w)+++")
+		};
 		[?? move(a,w)] {
 			forward robot_basic_movements -m doRotation : doRotation(a);
-			forward robot_basic_movements -m doBasicStep : doBasicStep
+			delay 800;
+			forward robot_basic_movements -m doBasicStep : doBasicStep;
+			println("+++move(a,w)+++")
 		};
 		[?? move(d,w)] {
 			forward robot_basic_movements -m doRotation : doRotation(d);
-			forward robot_basic_movements -m doBasicStep : doBasicStep
+			delay 800;
+			forward robot_basic_movements -m doBasicStep : doBasicStep;
+			println("+++move(d,w)+++")
 		}
 	]
 	transition

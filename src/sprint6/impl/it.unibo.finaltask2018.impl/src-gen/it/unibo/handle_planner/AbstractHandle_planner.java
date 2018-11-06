@@ -109,29 +109,49 @@ public abstract class AbstractHandle_planner extends QActor {
 	     PlanRepeat pr = PlanRepeat.setUp(getName()+"_moveRobot",0);
 	     pr.incNumIter(); 	
 	    	String myselfName = "moveRobot";  
+	    	//delay  ( no more reactive within a plan)
+	    	aar = delayReactive(1000,"" , "");
+	    	if( aar.getInterrupted() ) curPlanInExec   = "moveRobot";
+	    	if( ! aar.getGoon() ) return ;
 	    	it.unibo.myPlannerIntegrator.myPlanner.getMove( myself  );
 	    	if( (guardVars = QActorUtils.evalTheGuard(this, " ??move(n,n)" )) != null ){
 	    	temporaryStr = QActorUtils.unifyMsgContent(pengine,"noMoreMoves","noMoreMoves", guardVars ).toString();
 	    	sendMsg("noMoreMoves",getNameNoCtrl(), QActorContext.dispatch, temporaryStr ); 
 	    	}
 	    	if( (guardVars = QActorUtils.evalTheGuard(this, " ??move(n,w)" )) != null ){
+	    	{//actionseq
 	    	temporaryStr = QActorUtils.unifyMsgContent(pengine,"doBasicStep","doBasicStep", guardVars ).toString();
 	    	sendMsg("doBasicStep","robot_basic_movements", QActorContext.dispatch, temporaryStr ); 
+	    	temporaryStr = "\"+++move(n,w)+++\"";
+	    	println( temporaryStr );  
+	    	};//actionseq
 	    	}
 	    	if( (guardVars = QActorUtils.evalTheGuard(this, " ??move(a,w)" )) != null ){
 	    	{//actionseq
 	    	temporaryStr = QActorUtils.unifyMsgContent(pengine,"doRotation(VALUE)","doRotation(a)", guardVars ).toString();
 	    	sendMsg("doRotation","robot_basic_movements", QActorContext.dispatch, temporaryStr ); 
+	    	//delay  ( no more reactive within a plan)
+	    	aar = delayReactive(800,"" , "");
+	    	if( aar.getInterrupted() ) curPlanInExec   = "moveRobot";
+	    	if( ! aar.getGoon() ) return ;
 	    	temporaryStr = QActorUtils.unifyMsgContent(pengine,"doBasicStep","doBasicStep", guardVars ).toString();
 	    	sendMsg("doBasicStep","robot_basic_movements", QActorContext.dispatch, temporaryStr ); 
+	    	temporaryStr = "\"+++move(a,w)+++\"";
+	    	println( temporaryStr );  
 	    	};//actionseq
 	    	}
 	    	if( (guardVars = QActorUtils.evalTheGuard(this, " ??move(d,w)" )) != null ){
 	    	{//actionseq
 	    	temporaryStr = QActorUtils.unifyMsgContent(pengine,"doRotation(VALUE)","doRotation(d)", guardVars ).toString();
 	    	sendMsg("doRotation","robot_basic_movements", QActorContext.dispatch, temporaryStr ); 
+	    	//delay  ( no more reactive within a plan)
+	    	aar = delayReactive(800,"" , "");
+	    	if( aar.getInterrupted() ) curPlanInExec   = "moveRobot";
+	    	if( ! aar.getGoon() ) return ;
 	    	temporaryStr = QActorUtils.unifyMsgContent(pengine,"doBasicStep","doBasicStep", guardVars ).toString();
 	    	sendMsg("doBasicStep","robot_basic_movements", QActorContext.dispatch, temporaryStr ); 
+	    	temporaryStr = "\"+++move(d,w)+++\"";
+	    	println( temporaryStr );  
 	    	};//actionseq
 	    	}
 	    	//bbb

@@ -1,6 +1,7 @@
 plan(1,init, sentence(true,move(print("robot_basic_movements STARTED")),'','' ))
 plan(1,handleBasicStep, sentence(true,raise( robotMovement , robotMovement( movingForward) )'),'','' ))
-plan(2,handleBasicStep, sentence(true,move(resumeplan),'','' ))
+plan(2,handleBasicStep, sentence(true,move(print("+++Starting basic step+++")),'','' ))
+plan(3,handleBasicStep, sentence(true,move(resumeplan),'','' ))
 plan(1,goodResultBasicStep, sentence(true,raise( robotMovement , robotMovement( stopped) )'),'','' ))
 plan(2,goodResultBasicStep, sentence( notFirstTry,removeRule( notFirstTry ),'','' ))
 plan(3,goodResultBasicStep, sentence(true,raise( basicStepResult , basicStepResult( good) )'),'','' ))

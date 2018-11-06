@@ -111,6 +111,8 @@ public abstract class AbstractRobot_basic_movements extends QActor {
 	    	String myselfName = "handleBasicStep";  
 	    	temporaryStr = QActorUtils.unifyMsgContent(pengine, "robotMovement(VALUE)","robotMovement(movingForward)", guardVars ).toString();
 	    	emit( "robotMovement", temporaryStr );
+	    	temporaryStr = "\"+++Starting basic step+++\"";
+	    	println( temporaryStr );  
 	    	//bbb
 	     msgTransition( pr,myselfName,"robot_basic_movements_"+myselfName,true,
 	          new StateFun[]{stateTab.get("badResultBasicStep") }, 
