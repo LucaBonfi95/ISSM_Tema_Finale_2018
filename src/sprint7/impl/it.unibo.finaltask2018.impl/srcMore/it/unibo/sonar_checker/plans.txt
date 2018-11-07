@@ -1,0 +1,4 @@
+plan(1,init, sentence(true,move(print("sonar_checker STARTED")),'','' ))
+plan(1,handleSonar, sentence(true,eventswitch(modelChanged, »modelChanged( resource( name( sonar1),state( somethingDetected( true),_))), delay( 1000)  ),'','' ))
+plan(2,handleSonar, sentence(true,eventswitch(modelChanged, »modelChanged( resource( name( sonar2),state( somethingDetected( true),_))), delay( 1000)  ),'','' ))
+plan(3,handleSonar, sentence(true,move(resumeplan),'','' ))

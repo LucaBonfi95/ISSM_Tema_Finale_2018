@@ -1,0 +1,5 @@
+plan(1,init, sentence(true,move(print("stop_conditions_checker STARTED")),'','' ))
+plan(1,stopRobot, sentence(true,eventswitch(modelChanged, »modelChanged( resource( name( temperatureIsOk),state( false))), raise( stopRobot , stopRobot )') ),'','' ))
+plan(2,stopRobot, sentence(true,eventswitch(modelChanged, »modelChanged( resource( name( timeIsOk),state( false))), raise( stopRobot , stopRobot )') ),'','' ))
+plan(3,stopRobot, sentence(true,eventswitch(userstop, »userstop( user), raise( stopRobot , stopRobot )') ),'','' ))
+plan(4,stopRobot, sentence(true,move(resumeplan),'','' ))

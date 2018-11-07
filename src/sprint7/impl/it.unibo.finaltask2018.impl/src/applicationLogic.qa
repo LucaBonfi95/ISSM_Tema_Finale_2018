@@ -1,0 +1,315 @@
+System robot
+
+Event turnLed 			: turnLed(NAME, NEW_STATE)
+
+Event modelChanged 		: modelChanged(resource(NAME, STATE))
+
+Event local_BlinkOn 	: blinkOn
+Event local_BlinkOff 	: blinkOff 
+
+Event userstart 		: userstart(X)
+Event userstop 			: userstop(X)
+
+Event robotMovement 	: robotMovement(VALUE)
+
+Dispatch doBasicStep	: doBasicStep
+Dispatch doRotation		: doRotation(VALUE)
+Dispatch foundObstacle	: foundObstacle
+
+Event basicStepResult	: basicStepResult(VALUE)
+Event rotationResult	: rotationResult(VALUE)
+
+Event startRobot		: startRobot
+Event stopRobot			: stopRobot
+
+Dispatch noMoreMoves	: noMoreMoves
+
+// se si usa con il robot fisico al posto di localhost bisogna mettere l'indirizzo del pc
+Context ctxResourceModel ip[host="localhost" port=8099] -standalone 
+Context ctxApplicationLogic ip[host="localhost" port=8097]
+
+
+QActor robot_movement_finder context ctxApplicationLogic {
+	Plan init normal [
+		println("robot_movement_finder STARTED")
+	]
+	switchTo waitForModelChanged
+	
+	Plan waitForModelChanged []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> applLogic
+	finally
+		repeatPlan
+		
+	Plan applLogic resumeLastPlan [
+		onEvent modelChanged : modelChanged(resource(name(robot), state(movement(stopped), X))) -> 
+			emit local_BlinkOff : blinkOff;
+		
+		onEvent modelChanged : modelChanged(resource(name(robot), state(movement(movingForward), X))) -> 
+			emit local_BlinkOn : blinkOn;
+			
+		onEvent modelChanged : modelChanged(resource(name(robot), state(movement(movingBackward), X))) -> 
+			emit local_BlinkOn : blinkOn;
+			
+		onEvent modelChanged : modelChanged(resource(name(robot),state(movement(movingForward),obstacleDetected(true)))) ->
+			emit local_BlinkOff : blinkOff
+	]
+}
+
+
+QActor blink_controller context ctxApplicationLogic {
+	// the behaviour is the same for the real led and for the hue lamp
+	
+	Rules {
+		// rules needed by the application logic
+		ledName(led).
+	}
+	
+	Plan init normal [
+		println("blink_controller STARTED")
+	]
+	switchTo ledOff
+	
+	Plan ledOff [
+		println("Stato: ledOff");
+		[ !? ledName(NAME) ]
+			emit turnLed : turnLed(NAME, off)
+	]
+	transition
+		stopAfter 6000000
+		whenEvent local_BlinkOn -> ledBlinkingOn
+	
+	Plan ledBlinkingOn [
+		println("Stato: ledBlinking on");
+		[ !? ledName(NAME) ]
+			emit turnLed : turnLed(NAME, on)
+	]
+	transition
+		whenTime 500 -> ledBlinkingOff,
+		whenEvent local_BlinkOff -> ledOff
+		
+	Plan ledBlinkingOff [
+		println("Stato: ledBlinking off");
+		[ !? ledName(NAME) ]
+			emit turnLed : turnLed(NAME, off)
+	]
+	transition
+		whenTime 500 -> ledBlinkingOn,
+		whenEvent local_BlinkOff -> ledOff
+	
+}
+
+QActor initial_conditions_checker context ctxApplicationLogic {
+	Rules {
+		timeIsOk(true).
+		temperatureIsOk(true).
+		
+		startRequirementsOk :- timeIsOk(true), temperatureIsOk(true).
+	}
+	Plan init normal [
+		println("initial_conditions_checker STARTED")
+	]
+	switchTo waitForEvents
+	
+	Plan waitForEvents []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> checkEvent,
+		whenEvent userstart -> checkConditions
+	finally
+		repeatPlan
+		
+	Plan checkEvent resumeLastPlan [
+		onEvent modelChanged : modelChanged(resource(name(temperatureIsOk), state(X))) -> ReplaceRule temperatureIsOk(_) with temperatureIsOk(X);
+		onEvent modelChanged : modelChanged(resource(name(timeIsOk), state(X))) -> ReplaceRule timeIsOk(_) with timeIsOk(X) 
+	]
+	
+	Plan checkConditions resumeLastPlan [
+		onEvent userstart : userstart(user) -> {
+			[ !? startRequirementsOk ] 
+				emit startRobot : startRobot
+		}
+	]
+	
+}
+
+QActor stop_conditions_checker context ctxApplicationLogic {
+	Plan init normal [
+		println("stop_conditions_checker STARTED")
+	]
+	switchTo waitForEvents
+	
+	Plan waitForEvents []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> stopRobot,
+		whenEvent userstop -> stopRobot
+	finally
+		repeatPlan
+	
+	Plan stopRobot resumeLastPlan [
+		onEvent modelChanged : modelChanged(resource(name(temperatureIsOk), state(false))) -> emit stopRobot : stopRobot;
+		onEvent modelChanged : modelChanged(resource(name(timeIsOk), state(false))) -> emit stopRobot : stopRobot;
+		onEvent userstop : userstop(user) -> emit stopRobot : stopRobot
+	]
+}
+
+QActor sonar_checker context ctxApplicationLogic {
+	Plan init normal [
+		println("sonar_checker STARTED")
+	]
+	//switchTo waitForEvents
+	
+	Plan waitForEvents []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> handleSonar
+	finally
+		repeatPlan
+		
+	Plan handleSonar resumeLastPlan [
+		onEvent modelChanged : modelChanged(resource(name(sonar1), state(somethingDetected(true), _))) -> delay 1000; //TODO interagisce con classe Java che si occupa di muovere il robot
+		onEvent modelChanged : modelChanged(resource(name(sonar2), state(somethingDetected(true), _))) -> delay 1000 //TODO interagisce con classe Java che si occupa di muovere il robot
+	]
+}
+
+QActor robot_basic_movements context ctxApplicationLogic {
+	Plan init normal [
+		println("robot_basic_movements STARTED")
+	]
+	switchTo waitForMsgs
+	
+	Plan waitForMsgs []
+	transition
+		stopAfter 1000000
+		whenMsg doBasicStep -> handleBasicStep,
+		whenMsg doRotation -> handleRotation
+	finally
+		repeatPlan
+	
+	Plan handleBasicStep resumeLastPlan [
+		emit robotMovement : robotMovement(movingForward)
+	]
+	transition
+		whenTime 300 -> goodResultBasicStep,
+		whenMsg foundObstacle -> badResultBasicStep
+	
+	Plan goodResultBasicStep resumeLastPlan [
+		emit robotMovement : robotMovement(stopped);
+		[ !? notFirstTry ]
+			removeRule notFirstTry;
+		//emit something_that_says_the_basic_Step_had_a_good_result
+		emit basicStepResult : basicStepResult(good)
+	]
+	
+	Plan badResultBasicStep resumeLastPlan [
+		[ ?? notFirstTry ]
+			emit basicStepResult : basicStepResult(bad)
+			//emit something_that_says_the_basic_Step_had_a_bad_result
+		else {
+			addRule notFirstTry;
+			delay 500;
+			selfMsg doBasicStep : doBasicStep
+		}			
+	]		
+	
+	Plan handleRotation resumeLastPlan [
+		onMsg doRotation : doRotation(d) ->
+			emit robotMovement : robotMovement(turningRight);
+		onMsg doRotation : doRotation(a) ->
+			emit robotMovement : robotMovement(turningLeft)
+	]
+	transition
+		whenTime 300 -> goodResultRotation
+		
+	Plan goodResultRotation resumeLastPlan [
+		emit rotationResult : rotationResult(good)
+	]
+	
+}
+
+QActor collision_detector context ctxApplicationLogic {
+	Plan init normal [
+		println("collision_detector STARTED")
+	]
+	switchTo waitForEvents
+	
+	Plan waitForEvents []
+	transition
+		stopAfter 1000000
+		whenEvent modelChanged -> handleSonar
+	finally
+		repeatPlan
+		
+	Plan handleSonar resumeLastPlan [
+		onEvent modelChanged : modelChanged(resource(name(robot), state(movement(stopped), obstacleDetected(true)))) ->
+			forward robot_basic_movements -m foundObstacle : foundObstacle
+	]
+}
+
+QActor handle_planner context ctxApplicationLogic {
+	Plan init normal [
+		println("handle_planner STARTED");
+		javaRun it.unibo.myPlannerIntegrator.myPlanner.init()
+	]
+	switchTo waitForStart
+	
+	Plan waitForStart [
+		println("Waiting for start...")
+	]
+	transition 
+		stopAfter 1000000
+		whenEvent startRobot -> moveRobot
+	finally
+		repeatPlan
+	
+	Plan moveRobot [
+		delay 1000;
+		javaRun it.unibo.myPlannerIntegrator.myPlanner.getMove();
+		// move(X) --> X: n = none, a = left, d = right, w = forward)
+		[?? move(n)]{
+			selfMsg noMoreMoves : noMoreMoves
+		};
+		[?? move(w)]{ 
+			forward robot_basic_movements -m doBasicStep : doBasicStep
+		};
+		[?? move(a)] {
+			forward robot_basic_movements -m doRotation : doRotation(a)
+		};
+		[?? move(d)] {
+			forward robot_basic_movements -m doRotation : doRotation(d)
+		}
+	]
+	transition
+		stopAfter 1000000
+		whenEvent basicStepResult -> handleResult,
+		whenEvent rotationResult -> handleResult,
+		whenEvent stopRobot -> waitForStart,
+		whenMsg noMoreMoves -> waitForStart
+	finally
+		repeatPlan
+		
+	Plan handleResult resumeLastPlan [
+		onEvent basicStepResult : basicStepResult(bad) ->
+			javaRun it.unibo.myPlannerIntegrator.myPlanner.setMoveResult("bad");
+		onEvent basicStepResult : basicStepResult(good) ->
+			javaRun it.unibo.myPlannerIntegrator.myPlanner.setMoveResult("good");
+		onEvent rotationResult : rotationResult(good) ->
+			javaRun it.unibo.myPlannerIntegrator.myPlanner.setMoveResult("good")
+	]
+	
+}
+
+
+QActor mock_sender context ctxApplicationLogic -g gray {
+	Plan init normal [
+		println("mock_sender STARTED")
+	]
+	switchTo move
+	
+	Plan move [
+		delay 2500;
+		emit userstart : userstart(user)
+	]
+} 

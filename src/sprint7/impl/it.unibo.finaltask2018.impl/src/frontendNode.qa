@@ -1,0 +1,56 @@
+System robot
+
+Event local_userstart : userstart(X)
+Event local_userstop : userstop(X)
+
+
+// Events sensed also in the others context of the system
+Event userstart : userstart(X)
+Event userstop : userstop(X)
+
+
+Event modelChanged : modelChanged(RES)
+
+pubSubServer "tcp://localhost:1883"
+
+Context ctxResourceModel ip[host="localhost" port=8099] -standalone 
+Context ctxFrontend ip[host="localhost" port=8020]
+
+QActor qa2frontend context ctxFrontend {
+	Plan init normal [
+		connectAsPublisher "qa2frontend";
+		println("qa2frontend STARTED")
+	]
+	switchTo waitForEvents
+	
+	Plan waitForEvents []
+	transition
+		stopAfter 6000000
+		whenEvent modelChanged -> emitMqttEvent
+	finally
+		repeatPlan
+		
+	Plan emitMqttEvent resumeLastPlan [
+		onEvent modelChanged : modelChanged(RES) -> publishEvent "qa2frontend" -e modelChanged : modelChanged(RES)
+	]
+}
+
+QActor frontend2qa context ctxFrontend {
+	Plan init normal [
+		println("frontend2qa STARTED")
+	]
+	switchTo waitForEvent
+	
+	Plan waitForEvent []
+	transition
+		stopAfter 6000000
+		whenEvent local_userstart -> handleEvent,
+		whenEvent local_userstop -> handleEvent
+	finally
+		repeatPlan
+		
+	Plan handleEvent resumeLastPlan [
+		onEvent local_userstart : userstart(X) -> emit userstart : userstart(X);
+		onEvent local_userstop : userstop(X) -> emit userstop : userstop(X)
+	]
+}

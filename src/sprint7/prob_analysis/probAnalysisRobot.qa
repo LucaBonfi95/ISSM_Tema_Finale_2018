@@ -1,0 +1,249 @@
+System systemRobot
+
+Event robotCmd : robotCmd(X)
+Event sensorEvent : sensorEvent(X)
+Event outCmd : outCmd(X)
+
+Dispatch robotMindCmd : robotMindCmd(X)
+
+Context ctxProbRobot ip[host="localhost" port=5400] 
+
+QActor robot context ctxProbRobot {  
+	Rules {
+		limitTemperatureValue(25).
+		minTime(7).
+		maxTime(10).
+		currentTempValue(0).
+		currentTimeValue(0).
+		evalTemp:-
+			limitTemperatureValue(MAX), 
+			currentTempValue(VALUE),
+ 		    eval(ge, MAX, VALUE).	
+ 		evalTime:-
+ 			minTime(MIN),
+ 			maxTime(MAX),
+ 			currentTimeValue(VALUE),
+ 			eval(ge, VALUE, MIN),
+ 			eval(ge, MAX, VALUE).
+		startRequirementsOk :- evalTemp, evalTime.
+		map.
+	}
+	
+	Plan initial normal [
+		println("Robot started");
+		delay 2000
+	] 
+	
+	switchTo waitForEvent
+	
+	Plan waitForEvent [
+	]
+	transition stopAfter 600000
+		whenEvent robotCmd -> handleEvent,
+		whenEvent sensorEvent -> handleEvent
+	finally repeatPlan
+		
+	Plan handleEvent resumeLastPlan [
+		onEvent robotCmd : robotCmd(cmdstart) -> { 
+			[ !? startRequirementsOk ] {
+				println("Robot start"); 
+				emit outCmd : outCmd(startblinking);
+				[ !? map ] 
+					println("Robot cleans room (following optimal path)");
+					forward robotmind -m robotMindCmd : robotMindCmd(clean)
+				else 
+					println("Robot builds room map");
+					forward robotmind -m robotMindCmd : robotMindCmd(explore)
+			}
+		}; 
+		onEvent robotCmd : robotCmd(cmdstop) -> { 
+			println("Robot stop from user"); 
+			emit outCmd : outCmd(stopblinking)	
+		}; 
+		onEvent sensorEvent : sensorEvent(temp(VALUE)) -> ReplaceRule currentTempValue(X) with currentTempValue(VALUE);
+		onEvent sensorEvent : sensorEvent(temp(X)) -> {
+			[ not !? evalTemp ] {
+				println("Robot stop from temperature sensor"); 
+				emit outCmd : outCmd(stopblinking)	
+			}
+		};
+		onEvent sensorEvent : sensorEvent(timer(VALUE)) -> ReplaceRule currentTimeValue(X) with currentTimeValue(VALUE);
+		onEvent sensorEvent : sensorEvent(timer(X)) -> {
+			[ not !? evalTime ] {
+				println("Robot stop from time sensor"); 
+				emit outCmd : outCmd(stopblinking)	
+			}
+		};
+		printCurrentEvent
+	] 
+}
+
+QActor robotmind context ctxProbRobot {
+	Rules{
+		// size: index of last X cell and Y cell
+		dimX(0).
+		dimY(0).
+		incrementX:- dimX(X), retract(dimX(_)), X1 is X + 1, assert(dimX(X1)).
+		incrementY:- dimY(Y), retract(dimY(_)), Y1 is Y + 1, assert(dimY(Y1)).
+		// robot direction
+		dir(Y). 
+	}
+	Plan initial normal[
+		println("Robotmind started")
+	]
+	switchTo waitForMessage
+	
+	Plan waitForMessage [
+	]
+	transition stopAfter 600000
+		whenMsg robotMindCmd -> handleMovement,
+		whenEvent sensorEvent -> handleMovement
+	finally repeatPlan
+	
+	// ASSUMPTION: there are no obstacles in the room
+	Plan handleMovement [
+		onMsg robotMindCmd : robotMindCmd(explore) -> {
+			// doBasicStep() static method of robot class that must listen to events sensorEvent : sensorEvent(onboardsonar) 
+			javaRun robot.doBasicStep(); 
+			// robot starts from start-point towards the bottom-side, it changes its direction when it receives
+			// the event sensorEvent : sensorEvent(sonar2) and it goes forward until it hits the second sonar 
+			[?? basicStepResult(true)] {
+				[!? dir(X)]
+				 	demo incrementX
+				else
+					demo incrementY;
+				selfMsg robotMindCmd : robotMindCmd(explore) 
+			} 
+			else {
+				demo assert(map);
+				[!? dimX(X)] 
+					javaRun planner.setSizeX(X);
+				[!? dimY(Y)]
+					javaRun planner.setSizeY(Y);				
+				selfMsg robotMindCmd : robotMindCmd(clean)
+			}
+		};
+		onEvent sensorEvent : sensorEvent(sonar2) -> {
+			demo retract(dir(Y));
+			demo assert(dir(X))
+		};
+		onMsg robotMindCmd : robotMindCmd(clean) -> {
+			// nextMove = basicStep or 90 degree rotation + basicStep
+			javaRun planner.nextMove(); 
+			// nextMove(X,Y): 
+			// X = rotation (n = none, l = left, r = right); 
+			// Y = move (n = none, w = forward)
+			[!? nextMove(n,w)] 
+				javaRun robot.doBasicStep();
+			[!? nextMove(l,w)] {
+				javaRun robot.turnLeft();
+				javaRun robot.doBasicStep()
+			};
+			[!? nextMove(r,w)] {
+				javaRun robot.turnRight();
+				javaRun robot.doBasicStep()
+			};
+			[?? nextMove(_,w)]
+				selfMsg robotMindCmd : robotMindCmd(clean)
+		}
+		
+	]
+}
+
+QActor sonarsensor1 context ctxProbRobot {
+	Plan initial normal[
+		println("Sonar1 started");
+		delay 3000
+	]
+	switchTo emitEvents
+	
+	Plan emitEvents[
+		emit sensorEvent : sensorEvent(sonar1)
+	]
+}
+
+QActor sonarsensor2 context ctxProbRobot {
+	Plan initial normal[
+		println("Sonar2 started");
+		delay 3500
+	]
+	switchTo emitEvents
+	
+	Plan emitEvents[
+		emit sensorEvent : sensorEvent(sonar2)
+	]
+}
+
+QActor sonarrobot context ctxProbRobot {
+	Plan initial normal[
+		println("Sonar on board started");
+		delay 5000
+	]
+	switchTo emitEvents
+	
+	Plan emitEvents[
+		emit sensorEvent : sensorEvent(onboardsonar)
+	]
+}
+
+QActor temperaturesensor context ctxProbRobot {
+	Plan initial normal[
+		println("Temperature sensor started");
+		delay 4000
+	]
+	switchTo emitEvents
+	
+	Plan emitEvents[
+		emit sensorEvent : sensorEvent(temp(20));
+		delay 2000;
+		emit sensorEvent : sensorEvent(temp(30))
+	]
+}
+
+QActor timersensor context ctxProbRobot {
+	Plan initial normal[
+		println("Timer sensor started");
+		delay 4500
+	]
+	switchTo emitEvents
+	
+	Plan emitEvents[
+		emit sensorEvent : sensorEvent(timer(9));
+		delay 2000;
+		emit sensorEvent : sensorEvent(timer(12))
+	]
+}
+
+QActor led context ctxProbRobot {
+	Plan initial normal[
+		println("Led started")
+	]
+	switchTo waitForEvent
+	
+	Plan waitForEvent[]	
+	transition stopAfter 600000
+		whenEvent outCmd -> handleEvent
+	finally repeatPlan
+	
+	Plan handleEvent resumeLastPlan [ 
+		onEvent outCmd : outCmd(startblinking) -> println("Led start blinking");
+		onEvent outCmd : outCmd(stopblinking) -> println("Led stop blinking")
+	]  
+}
+
+QActor huelamp context ctxProbRobot {
+	Plan initial normal[
+		println("Hue Lamp started")
+	]
+	switchTo waitForEvent
+	
+	Plan waitForEvent[]	
+	transition stopAfter 600000
+		whenEvent outCmd -> handleEvent
+	finally repeatPlan
+	
+	Plan handleEvent resumeLastPlan [ 
+		onEvent outCmd : outCmd(startblinking) -> println("Hue Lamp start blinking");
+		onEvent outCmd : outCmd(stopblinking) -> println("Hue Lamp stop blinking")
+	]  
+}

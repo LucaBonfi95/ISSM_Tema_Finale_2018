@@ -1,0 +1,3 @@
+plan(1,init, sentence(true,move(print("collision_detector STARTED")),'','' ))
+plan(1,handleSonar, sentence(true,eventswitch(modelChanged, »modelChanged( resource( name( robot),state( movement( stopped),obstacleDetected( true)))), forward(robot_basic_movements, foundObstacle,foundObstacle) ),'','' ))
+plan(2,handleSonar, sentence(true,move(resumeplan),'','' ))

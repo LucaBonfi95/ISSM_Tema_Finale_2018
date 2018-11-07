@@ -1,0 +1,4 @@
+plan(1,init, sentence(true,move(print("resource_representation_element STARTED")),'','' ))
+plan(1,outputingData, sentence( ledName( NAME),eventswitch(modelChanged, »modelChanged( resource( name( NAME),state( on))), not here StateMoveNormal ),'','' ))
+plan(2,outputingData, sentence( ledName( NAME),eventswitch(modelChanged, »modelChanged( resource( name( NAME),state( off))), not here StateMoveNormal ),'','' ))
+plan(3,outputingData, sentence(true,move(resumeplan),'','' ))

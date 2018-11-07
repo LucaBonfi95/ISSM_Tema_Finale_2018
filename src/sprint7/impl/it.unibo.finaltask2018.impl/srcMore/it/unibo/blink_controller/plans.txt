@@ -1,0 +1,7 @@
+plan(1,init, sentence(true,move(print("blink_controller STARTED")),'','' ))
+plan(1,ledOff, sentence(true,move(print("Stato: ledOff")),'','' ))
+plan(2,ledOff, sentence( ledName( NAME),raise( turnLed , turnLed( NAME,off) )'),'','' ))
+plan(1,ledBlinkingOn, sentence(true,move(print("Stato: ledBlinking on")),'','' ))
+plan(2,ledBlinkingOn, sentence( ledName( NAME),raise( turnLed , turnLed( NAME,on) )'),'','' ))
+plan(1,ledBlinkingOff, sentence(true,move(print("Stato: ledBlinking off")),'','' ))
+plan(2,ledBlinkingOff, sentence( ledName( NAME),raise( turnLed , turnLed( NAME,off) )'),'','' ))

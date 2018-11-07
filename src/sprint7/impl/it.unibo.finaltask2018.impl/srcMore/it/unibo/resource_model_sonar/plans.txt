@@ -1,0 +1,4 @@
+plan(1,init, sentence(true,move(print("resource_model_sonar STARTS")),'','' ))
+plan(2,init, sentence(true,move(solve,consult( "resourceModel.pl"),0,""),'','' ))
+plan(1,handleSonar, sentence(true,eventswitch(sonarDetected, »sonarDetected( name( NAME),somethingDetected( VALUE),distance( DVALUE)), move(solve,changeModelItem( NAME,state( somethingDetected( VALUE),distance( DVALUE))),0,"") ),'','' ))
+plan(2,handleSonar, sentence(true,move(resumeplan),'','' ))
