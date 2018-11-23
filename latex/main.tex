@@ -24,6 +24,8 @@
 
 
 \setcounter{tocdepth}{1}
+% NUMERO SPRINT CORRENTE
+\newcommand{\version}{7}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
 
@@ -140,7 +142,7 @@
 	stringstyle=\color{stringcolor},
 	tabsize=2,
 	inputencoding=utf8/latin1,
-	caption=\lstname	% to use with \lstinputlisting
+	%caption=\lstname	% to use with \lstinputlisting
 }
 
 % add page numbers
@@ -278,8 +280,8 @@ Per formalizzare il requisito \code{R-FloorClean} è prima necessario stabilire 
 
 Vengono di seguito riportati i modelli formali risultati dall'analisi dei requisiti:
 
-\lstinputlisting[label={lst:reqAnalysisRobot}]{../src/sprint5/req_analysis/reqAnalysisRobot.qa}
-\lstinputlisting[label={lst:reqAnalysisUser}]{../src/sprint5/req_analysis/reqAnalysisUser.qa}
+\lstinputlisting[label={lst:reqAnalysisRobot}, title={\footnotesize reqAnalysisRobot.qa}]{../src/sprint\version/req_analysis/reqAnalysisRobot.qa}
+\lstinputlisting[label={lst:reqAnalysisUser}, title={\footnotesize reqAnalysisUser.qa}]{../src/sprint\version/req_analysis/reqAnalysisUser.qa}
 
 Prima di descrivere più dettagliatamente i modelli prodotti durante l'analisi dei requisiti è necessaria una premessa relativa alle modalità di interazione dei componenti del sistema. Trattandosi di un sistema eterogeneo distribuito, ed utilizzando il linguaggio di modellazione \action{QActor}, le due modalità con cui i componenti all'interno del sistema possono interagire sono quelle ad eventi e messaggi. 
 
@@ -322,31 +324,15 @@ La comunicazione tra utente e robot tramite \action{GUI} può avvenire via messa
 
 Vengono di seguito riportati i modelli formali prodotti dall'analisi del problema, in cui viene delineata l'\textbf{architettura logica} del sistema risultante dalla fase di analisi: 
 
-\lstinputlisting[label={lst:probAnalysisRobot}]{../src/sprint5/prob_analysis/probAnalysisRobot.qa}
-\lstinputlisting[label={lst:probAnalysisUser}]{../src/sprint5/prob_analysis/probAnalysisUser.qa}
+\lstinputlisting[label={lst:probAnalysisRobot},title={\footnotesize probAnalysisRobot.qa}]{../src/sprint5/prob_analysis/probAnalysisRobot.qa}
+\lstinputlisting[label={lst:probAnalysisUser},title={\footnotesize probAnalysisUser.qa}]{../src/sprint5/prob_analysis/probAnalysisUser.qa}
 
-In conseguenza a quanto emerso dall'analisi dei requisiti, il sistema \action{systemRobot} è stato modellato come composizione di due contesti, rinominati per comodità \action{ctxProbRobot} e \action{ctxProbUser}. 
-
-Per ciò che riguarda il contesto standalone \action{ctxProbRobot}, la logica necessaria a soddisfare i requisiti \code{R-TempOk} e \code{R-TimeOk} è stata modellata attraverso una base di conoscenza espressa tramite regole Prolog inserite all'interno del QActor \textbf{robot}. \\ Come appurato in analisi dei requisiti il robot deve essere sensibile agli eventi \textbf{robotCmd : robotCmd(X)} e \textbf{sensorEvent : sensorEvent(X)}. \\ In particolare, per ciò che riguarda il QActor \textbf{robot}: 
-\begin{itemize}
-	\item alla ricezione dell'evento \textbf{robotCmd : robotCmd(cmdstart)} viene prima controllato che siano soddisfatti i requisiti di tempo e temperatura e viene poi emesso l'evento \textbf{outCmd : outCmd(startblinking)} necessario ad avviare il blinking del led e della lampada hue. \\ Quindi viene controllato se sia già stata costruita una mappa della stanza ed inviato il messaggio \textbf{robotMindCmd : robotMindCmd(X)} al QActor \textbf{robotmind}, dove X assume i valori: 
-	\begin{itemize}
-		\item \textbf{clean} se la mappa è presente nella base di conoscenza essendo stata costruita in precedenza;
-		\item \textbf{explore} se non è presente alcuna mappa nella base di conoscenza del robot.
-	\end{itemize}
-	\item alla ricezione dell'evento \textbf{robotCmd : robotCmd(cmdstop)} viene emesso l'evento \textbf{outCmd : outCmd(stopblinking)} necessario ad interrompere il blinking del led e della lampada hue;
-	\item alla ricezione degli eventi \textbf{sensorEvent : sensorEvent(temp(X))} e \textbf{sensorEvent : sensorEvent(timer(X))} viene controllato che siano ancora soddisfatti rispettivamente il requisito di temperatura ed il requisito di tempo, ed in caso contrario viene emesso l'evento \textbf{outCmd : outCmd(stopblinking)} necessario ad interrompere il blinking di led e lampada hue.
-\end{itemize}
 Tenendo conto delle assunzioni e delle considerazioni già affrontate in analisi dei requisiti, assumendo inizialmente per semplicità che la stanza sia rettangolare e priva di ostacoli, il requisito \code{R-FloorClean} è stato modellato attraverso l'introduzione del QActor \textbf{robotmind}. \\ Quest'ultimo possiede una propria base di conoscenza necessaria a tenere traccia delle dimensioni della stanza e della direzione corrente del robot. Tale QActor è sensibile ai messaggi \textbf{robotMindCmd} ed agli eventi \textbf{sensorEvent}, in particolare:
 \begin{itemize}
 	\item alla ricezione del messaggio \textbf{robotMindCmd : robotMindCmd(explore)} viene invocato il metodo statico \textbf{doBasicStep()} della classe Java \textbf{robot}, a cui viene delegata l'esecuzione del basic step del robot. Questo metodo deve tenere conto degli eventi \textbf{sensorEvent : sensorEvent(onboardsonar)} per determinare quando il robot si è imbattuto in un ostacolo, che secondo le precedenti assunzioni viene a coincidere con il secondo sonar. In seguito a ciò viene discriminato il buon esito del basic step, determinato dalla presenza o dall'assenza di un ostacolo lungo il percorso del robot. A seconda della direzione del robot vengono incrementate le dimensioni della stanza. Il caso di fallimento del basic step in questa fase di cosiddetta "esplorazione" si verifica quando il robot colpisce il secondo sonar: in tal caso vengono invocati i metodi statici della classe \textbf{planner} necessari ad indicare al planner le dimensioni della stanza per poi passare alla fase di pulizia della stanza vera e propria con l'invio del messaggio \textbf{robotMindCmd : robotMindCmd(clean)}.
 	\item alla ricezione dell'evento \textbf{sensorEvent : sensorEvent(sonar2)} viene modificata la direzione del robot memorizzata nella base di conoscenza;
 	\item alla ricezione del messaggio \textbf{robotMindCmd : robotMindCmd(clean)} viene dapprima invocato il metodo statico \textbf{nextMove()} della classe Java \textbf{planner}, dove per planner si intende un'entità a conoscenza delle dimensioni della stanza in grado di determinare la prossima mossa del robot (basic step o basic step + rotazione di 90 gradi), inserita nella base di conoscenza di volta in volta, col fine di coprire l'intera area della stanza. A seconda della mossa indicata dal planner vengono invocati i metodi statici della classe \textbf{robot} necessari ad eseguire la mossa. \\ La pulizia della stanza si intende conclusa quando viene aggiunto dal planner alla base di conoscenza il fatto \textbf{nextMove(n,n)}, che indica al robot di non eseguire nessun movimento ulteriore. 
 \end{itemize}
-I QActor \textbf{sonarsensor1}, \textbf{sonarsensor2}, \textbf{sonarrobot}, \textbf{temperaturesensor} e \textbf{timersensor} emettono eventi \textbf{sensorEvent : sensorEvent(X)} con un payload specifico in base al tipo di sensore che rappresentano. \\
-I QActor \textbf{huelamp} e \textbf{led} modellano invece i dispositivi attuatori, ed entrambi si mettono in attesa degli eventi \textbf{outCmd : outCmd(startblinking)} e \textbf{outCmd : outCmd(stopblinking)}, alla ricezione dei quali rispettivamente avviano o interrompono il blinking. 
-
-Per quanto riguarda il contesto \action{ctxProbUser} il QActor \textbf{user} modella l'utente che, una volta autenticato, può inviare messaggi \textbf{userCmd : userCmd(cmdstart)} e \textbf{userCmd : userCmd(cmdstop)} all'attore \textbf{gui}, che a sua volta, alla ricezione dei messaggi, si occupa di emettere gli eventi corrispondenti, eventi a cui deve essere sensibile il robot. 
 
 %=========================================================================
 
@@ -354,12 +340,12 @@ Per quanto riguarda il contesto \action{ctxProbUser} il QActor \textbf{user} mod
 \labelsec{Project}
 %=========================================================================
 
-\lstinputlisting[label={lst:designResourseModel}]{../src/sprint4/design/it.unibo.finaltask2018.design/src/resourceModel.qa}
-\lstinputlisting[label={lst:designAppl}]{../src/sprint5/design/it.unibo.finaltask2018.design/src/applicationLogic.qa}
-\lstinputlisting[label={lst:designOut}]{../src/sprint5/design/it.unibo.finaltask2018.design/src/output.qa}
-\lstinputlisting[label={lst:designIn}]{../src/sprint5/design/it.unibo.finaltask2018.design/src/input.qa}
-\lstinputlisting[label={lst:designIn}]{../src/sprint5/design/it.unibo.finaltask2018.design/src/real_robot_adapter.qa}
-\lstinputlisting[label={lst:designIn}]{../src/sprint5/design/it.unibo.finaltask2018.design/src/real_led_adapter.qa}
+\lstinputlisting[label={lst:designResourseModel},title={\footnotesize resourceModel.qa}]{../src/sprint\version/impl/it.unibo.finaltask2018.impl/src/resourceModel.qa}
+\lstinputlisting[label={lst:designOut},title={\footnotesize output.qa}]{../src/sprint\version/impl/it.unibo.finaltask2018.impl/src/output.qa}
+\lstinputlisting[label={lst:designIn}, title={\footnotesize input.qa}]{../src/sprint\version/impl/it.unibo.finaltask2018.impl/src/input.qa}
+\lstinputlisting[label={lst:designAppl},title={\footnotesize applicationLogic.qa}]{../src/sprint\version/impl/it.unibo.finaltask2018.impl/src/applicationLogic.qa}
+\lstinputlisting[label={lst:designIn}, title={\footnotesize real\_robot\_adapter.qa}]{../src/sprint\version/design/it.unibo.finaltask2018.design/src/real_robot_adapter.qa}
+\lstinputlisting[label={lst:designIn}, title={\footnotesize real\_led\_adapter.qa}]{../src/sprint\version/design/it.unibo.finaltask2018.design/src/real_led_adapter.qa}
 
 
 \section{Implementazione}
