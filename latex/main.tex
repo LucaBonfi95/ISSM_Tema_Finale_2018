@@ -14,6 +14,8 @@
 
 \usepackage{manifest}
 
+\usepackage{verbatim}
+
 \definecolor{backcolor}{rgb}{0.988,0.988,0.988}
 \definecolor{debcolor}{rgb}{0.97,1,1}
 \definecolor{commentcolor}{rgb}{0,0.5,0}
@@ -257,7 +259,38 @@ Durante il suo funzionamento il robot può opzionalmente:
 
 \section{Analisi dei requisiti}
 \labelsec{ReqAnalysis}
-Il sistema da modellare sarà, come esplicitato dai requisiti, eterogeneo e distribuito, in particolare composto da almeno due nodi: il nodo "Robot" e il nodo "PC/Android". \\
+
+I requisiti sono stati analizzati e formalizzati in modo iterativo in ordine di importanza, come riportato nel Product Backlog di Table \ref{tab:pb}. \\
+
+% INSERISCI TABELLA PRODUCT BACKLOG
+\begin{table}
+	\centering
+	\begin{tabular}{|l|c|}
+		\hline \textbf{Requisito} & \textbf{Priorità} \\ \hline
+		R-FloorClean & 1 \\ \hline
+		R-Map & 2 \\ \hline
+		R-AvoidFix & 3 \\ \hline
+		R-AvoidMobile & 4 \\ \hline
+		R-Obstacle & 5 \\ \hline
+		R-BlinkHue & 6 \\ \hline
+		R-BlinkLed & 6 \\ \hline
+		R-Start & 7 \\ \hline
+		R-TempOk & 7 \\ \hline
+		R-TimeOk & 7 \\ \hline
+		R-Stop & 7 \\ \hline
+		R-TempKo & 7 \\ \hline
+		R-TimeKo & 7 \\ \hline
+		R-End & 7 \\ \hline
+	\end{tabular} 
+	\\[1\baselineskip]
+	\caption{Product Backlog}
+	\label{tab:pb}
+\end{table}
+Per formalizzare il requisito \code{R-FloorClean} è prima necessario stabilire cosa si intenda con pulire tutto il pavimento. Introducendo l'assunzione che la stanza sia rettangolare è possibile suddividerne la superficie in celle quadrate di dimensione fissa. Il lato delle celle dovrà essere di lunghezza non superiore al lato di dimensione maggiore del robot. Occorre quindi introdurre il concetto di \textbf{basic step}, ovvero un movimento che copra la distanza pari al lato della cella. Un basic step ha successo se il robot riesce ad avanzare nella cella successiva, mentre fallisce se la cella successiva è occupata da un ostacolo fisso. Al termine di un basic step la cella in cui il robot si trova è da considerarsi pulita. Qualsiasi percorso del robot dovrà essere espresso come una sequenza di basic step e di rotazioni di 90$^{\circ}$. \\ Fatte queste premesse, pulire tutta la stanza equivale a pulire ogni cella della stanza non occupata da un ostacolo fisso. Come da requisito \code{R-Map}, se è già stata costruita una mappa della stanza, il robot segue un percorso predefinito dallo \code{start-point} all'\code{end-point}, altrimenti procede nella pulizia della stanza costruendone la mappa. 
+
+% INSERIRE IMMAGINE CON GRIGLIA DELLA STANZA
+
+Il sistema da modellare è eterogeneo e distribuito, in particolare composto da almeno due nodi: il nodo "Robot" e il nodo "PC/Android". \\
 Per la modellazione si utilizza il linguaggio \qa\ in quanto adatto alla modellazione di sistemi distribuiti. 
 
 \begin{figure}[h]
@@ -267,7 +300,7 @@ Per la modellazione si utilizza il linguaggio \qa\ in quanto adatto alla modella
 	\label{fig:reqAnalysis}
 \end{figure}
 
-Il primo dei due nodi che si è modellati è il nodo "PC/Android" che si occupa di mostrare la \action{GUI} e di interagire direttamente con un utente umano, richiedendone l'autenticazione. Come da requisito \code{R-Start} l'interfaccia utente deve poter essere utilizzabile sia su \action{PC} che su un dispositivo \action{Android}. Tuttavia, essendo le funzioni che essa deve svolgere identiche in entrambi i casi, si sono rappresentati entrambi i nodi come un unico nodo. Su questo nodo esegue l'attore "GUI/Authenticator", che consente all'utente di autenticarsi e inviare i comandi di \action{START} e \action{STOP} al robot (\code{R-Start} e \code{R-Stop}). 
+Il primo dei due nodi ad essere modellato è il nodo "PC/Android" che si occupa di mostrare la \action{GUI} e di interagire direttamente con un utente umano, richiedendone l'autenticazione. Come da requisito \code{R-Start} l'interfaccia utente deve poter essere utilizzabile sia su \action{PC} che su un dispositivo \action{Android}. Tuttavia, essendo le funzioni che essa deve svolgere identiche in entrambi i casi, si sono rappresentati entrambi i nodi come un unico nodo. Su questo nodo esegue l'attore "GUI/Authenticator", che consente all'utente di autenticarsi e inviare i comandi di \action{START} e \action{STOP} al robot (\code{R-Start} e \code{R-Stop}). 
 
 Il secondo nodo che si è modellato è il nodo "Raspberry/PC", responsabile del controllo del robot. Esso può essere in esecuzione su un PC, nel caso del \fname{virtual} robot, oppure su un Raspberry Pi nel caso del \fname{real} robot. \\ L'attore "Robot" si pone in attesa dei comandi inviati da "GUI/Authenticator" ed è in grado di ricevere informazioni relative alle condizioni di temperatura ed al tempo (\code{R-TempOk}, \code{R-TimeOk}, \code{R-TempKo}, \code{R-TimeKo}). Durante l'esecuzione, se il robot è in movimento, l'attore "Robot" invia a "Led" e a "Hue Lamp" i comandi per l'accensione e lo spegnimento necessari a farli lampeggiare (\code{R-BlinkLed}, \code{R-BlinkHue}). 
 
@@ -276,46 +309,36 @@ L'attore "Robot" si occupa inoltre di gestire la logica applicativa, che consist
 Inoltre, se l'attore "Robot" trova un ostacolo che non riesce ad evitare si deve fermare (\code{R-Obstacle}).
 Questa situazione si verifica quando il robot trova uno o più ostacoli che gli impediscono di raggiungere il secondo sonar.
 
-Per formalizzare il requisito \code{R-FloorClean} è prima necessario stabilire cosa si intenda con pulire tutto il pavimento. Introducendo l'assunzione che la stanza sia rettangolare è possibile suddividerne la superficie in celle quadrate di dimensione fissa. Il lato delle celle dovrà essere di lunghezza non superiore al lato di dimensione maggiore del robot. Occorre quindi introdurre il concetto di basic step, ovvero un movimento che copra la distanza pari al lato della cella. Un basic step ha successo se il robot riesce ad avanzare nella cella successiva, mentre fallisce se la cella successiva è occupata da un ostacolo fisso. Al termine di un basic step la cella in cui il robot si trova è da considerarsi pulita. Qualsiasi percorso del robot dovrà essere espresso come una sequenza di basic step e di rotazioni di 90$^{\circ}$. \\ Fatte queste premesse, pulire tutta la stanza equivale a pulire ogni cella della stanza non occupata da un ostacolo fisso. Come da requisito \code{R-Map}, se è già stata costruita una mappa della stanza, il robot segue un percorso predefinito dallo \code{start-point} all'\code{end-point}, altrimenti procede nella pulizia della stanza costruendone la mappa. 
 
-Vengono di seguito riportati i modelli formali risultati dall'analisi dei requisiti:
+
+Vengono di seguito riportati i modelli formali risultati dall'analisi dei requisiti che evidenziano una prima \textbf{architettura logica}:
 
 \lstinputlisting[label={lst:reqAnalysisRobot}, title={\footnotesize reqAnalysisRobot.qa}]{../src/sprint\version/req_analysis/reqAnalysisRobot.qa}
 \lstinputlisting[label={lst:reqAnalysisUser}, title={\footnotesize reqAnalysisUser.qa}]{../src/sprint\version/req_analysis/reqAnalysisUser.qa}
 
-Prima di descrivere più dettagliatamente i modelli prodotti durante l'analisi dei requisiti è necessaria una premessa relativa alle modalità di interazione dei componenti del sistema. Trattandosi di un sistema eterogeneo distribuito, ed utilizzando il linguaggio di modellazione \action{QActor}, le due modalità con cui i componenti all'interno del sistema possono interagire sono quelle ad eventi e messaggi. 
+Trattandosi di un sistema eterogeneo distribuito, ed utilizzando il linguaggio di modellazione \action{QActor}, le due modalità con cui i componenti all'interno del sistema possono interagire sono quelle ad \textbf{eventi} e \textbf{messaggi}. 
 
-In questo ambito un messaggio non è altro che un'informazione che il mittente invia ad uno specifico destinatario; al contrario, un evento cattura il concetto di informazione senza specifico destinatario: tutti i componenti del sistema interessati all'evento possono riceverlo. \\
+In questo ambito un \textbf{messaggio} non è altro che un'informazione che il mittente invia ad uno \textbf{specifico destinatario}; al contrario, un \textbf{evento} cattura il concetto di informazione \textbf{senza specifico destinatario}: tutti i componenti del sistema interessati all'evento possono riceverlo. 
 
-Il sistema \action{systemRobot} è stato modellato come un sistema costituito di due contesti, il contesto stand-alone \action{ctxRobot} ed il contesto \action{ctxUser}. 
-
-All'interno del primo contesto operano i Qactor:
-\begin{itemize}
-	\item \textbf{robot}: si mette in attesa di due eventi: 
-	\begin{itemize}
-		\item \textbf{robotCmd : robotCmd(X)}: evento emesso dall'utente autenticato per comandare il robot (start/stop), alla ricezione del quale viene emesso l'evento \textbf{outCmd : outCmd(X)}, necessario per comandare il funzionamento del led e della lampada Hue;
-		\item \textbf{sensorEvent : sensorEvent(X)}: evento che può essere emesso dai sonar presenti nella stanza o dalle sorgenti dei dati di temperatura e tempo.
-	\end{itemize}
-	 \item \textbf{sonarsensor1}, \textbf{sonarsensor2}, \textbf{temperaturesensor}, \textbf{timersensor}: emettono eventi \textbf{sensorEvent : sensorEvent(X)}, catturati dall'attore \textbf{robot}.
-	 \item \textbf{led}, \textbf{huelamp}: si mettono in attesa 
-	 degli eventi \textbf{outCmd : outCmd(X)}, emessi dall'attore \textbf{robot}. 
-\end{itemize}
 Dall'analisi dei requisiti sono emerse le necessità di interazione tra i sonar ed il robot, tra le sorgenti dei dati di temperatura e tempo ed il robot, nonché tra il robot stesso e i dispositivi attuatori, in questo caso led e lampada hue. \\
 Sarebbe possibile modellare queste interazioni come messaggi: in questo caso sia i sonar che le sorgenti di temperatura e tempo dovrebbero conoscere lo specifico destinatario dei loro messaggi; allo stesso modo il robot dovrebbe conoscere i specifici dispositivi attuatori a cui inviare le informazioni. \\
-Alla luce di ciò risulta più conveniente modellare queste interazioni tramite eventi, che permettono un maggiore disaccoppiamento delle entità in gioco, consentendo eventualmente a più robot distinti di raccogliere i dati in input e a differenti attuatori di ricevere comandi dal robot. \\
+Alla luce di ciò risulta più conveniente modellare queste interazioni tramite eventi, che permettono un maggiore disaccoppiamento delle entità in gioco, consentendo eventualmente a più robot distinti di raccogliere i dati in input e a differenti attuatori di ricevere comandi dal robot. 
 
-All'interno del contesto \action{ctxUser} operano invece gli attori:
-\begin{itemize}
-	\item \textbf{user}: invia messaggi \textbf{userCmd : userCmd(X)} all'attore \textbf{gui};
-	\item \textbf{gui}: riceve i messaggi \textbf{userCmd : userCmd(X)} emettendo eventi \textbf{robotCmd : robotCmd(X)} destinati a comandare il robot.
-\end{itemize}
-In questo caso non si evidenziano particolari differenze nel modellare l'interazione user-gui tramite messaggi piuttosto che tramite eventi. 
-Per quanto riguarda l'interazione gui-robot è più opportuno che essa sia modellata tramite eventi piuttosto che tramite messaggi, in quanto risultano più vantaggiosi per disaccoppiare l'interfaccia grafica dallo specifico robot comandato. 
+Per quanto riguarda l'interazione user-GUI non si evidenziano particolari differenze nel modellarla tramite messaggi piuttosto che tramite eventi. 
+Per quanto riguarda l'interazione gui-robot è più opportuno che essa sia modellata mediante eventi piuttosto che attraverso messaggi, in quanto risultano più vantaggiosi per disaccoppiare l'interfaccia grafica dallo specifico robot comandato. 
 
 %=========================================================================
 
 \section{Analisi del problema}
 \labelsec{ProblemAnalysis}
+
+Tenendo conto delle assunzioni e delle considerazioni già affrontate in analisi dei requisiti, assumendo inizialmente per semplicità che la stanza sia rettangolare e priva di ostacoli, il requisito \code{R-FloorClean} è stato modellato attraverso l'introduzione del QActor \textbf{robotmind}. \\ Quest'ultimo possiede una propria base di conoscenza necessaria a tenere traccia delle dimensioni della stanza e della direzione corrente del robot. Tale QActor è sensibile ai messaggi \textbf{robotMindCmd} ed agli eventi \textbf{sensorEvent}, in particolare:
+\begin{itemize}
+	\item alla ricezione del messaggio \textbf{robotMindCmd : robotMindCmd(explore)} viene invocato il metodo statico \textbf{doBasicStep()} della classe Java \textbf{robot}, a cui viene delegata l'esecuzione del basic step del robot. Questo metodo deve tenere conto degli eventi \textbf{sensorEvent : sensorEvent(onboardsonar)} per determinare quando il robot si è imbattuto in un ostacolo, che secondo le precedenti assunzioni viene a coincidere con il secondo sonar. In seguito a ciò viene discriminato il buon esito del basic step, determinato dalla presenza o dall'assenza di un ostacolo lungo il percorso del robot. A seconda della direzione del robot vengono incrementate le dimensioni della stanza. Il caso di fallimento del basic step in questa fase di cosiddetta "esplorazione" si verifica quando il robot colpisce il secondo sonar: in tal caso vengono invocati i metodi statici della classe \textbf{planner} necessari ad indicare al planner le dimensioni della stanza per poi passare alla fase di pulizia della stanza vera e propria con l'invio del messaggio \textbf{robotMindCmd : robotMindCmd(clean)}.
+	\item alla ricezione dell'evento \textbf{sensorEvent : sensorEvent(sonar2)} viene modificata la direzione del robot memorizzata nella base di conoscenza;
+	\item alla ricezione del messaggio \textbf{robotMindCmd : robotMindCmd(clean)} viene dapprima invocato il metodo statico \textbf{nextMove()} della classe Java \textbf{planner}, dove per planner si intende un'entità a conoscenza delle dimensioni della stanza in grado di determinare la prossima mossa del robot (basic step o basic step + rotazione di 90 gradi), inserita nella base di conoscenza di volta in volta, col fine di coprire l'intera area della stanza. A seconda della mossa indicata dal planner vengono invocati i metodi statici della classe \textbf{robot} necessari ad eseguire la mossa. \\ La pulizia della stanza si intende conclusa quando viene aggiunto dal planner alla base di conoscenza il fatto \textbf{nextMove(n,n)}, che indica al robot di non eseguire nessun movimento ulteriore. 
+\end{itemize}
+
 Il primo problema che sorge è quello di stabilire quale nodo si occuperà di autenticare l'utente. Una possibilità è quella di relegare l'autenticazione al nodo del robot: in questo caso il robot potrebbe non disporre delle adeguate risorse computazionali per gestire il processo di autenticazione, tuttavia questo garantirebbe maggiore sicurezza. Un'altra possibilità è che l'autenticazione venga gestita da un nodo diverso rispetto a quello del robot: ciò consentirebbe di non utilizzare le risorse computazionali del robot richiedendo però maggiori accortezze sulla sicurezza. In quest'ultimo caso l'autenticazione potrebbe essere gestita dal nodo dell'utente oppure da un nodo distinto, il quale comporterebbe costi maggiori.
 
 Un altro problema è quello dell'interfaccia \action{GUI}, che deve poter eseguire su dispositivi eterogenei. A tal proposito, una possibilità sarebbe creare client nativi per ogni piattaforma con costi elevati oppure più semplicemente utilizzare una pagina web. 
@@ -327,25 +350,20 @@ Vengono di seguito riportati i modelli formali prodotti dall'analisi del problem
 \lstinputlisting[label={lst:probAnalysisRobot},title={\footnotesize probAnalysisRobot.qa}]{../src/sprint5/prob_analysis/probAnalysisRobot.qa}
 \lstinputlisting[label={lst:probAnalysisUser},title={\footnotesize probAnalysisUser.qa}]{../src/sprint5/prob_analysis/probAnalysisUser.qa}
 
-Tenendo conto delle assunzioni e delle considerazioni già affrontate in analisi dei requisiti, assumendo inizialmente per semplicità che la stanza sia rettangolare e priva di ostacoli, il requisito \code{R-FloorClean} è stato modellato attraverso l'introduzione del QActor \textbf{robotmind}. \\ Quest'ultimo possiede una propria base di conoscenza necessaria a tenere traccia delle dimensioni della stanza e della direzione corrente del robot. Tale QActor è sensibile ai messaggi \textbf{robotMindCmd} ed agli eventi \textbf{sensorEvent}, in particolare:
-\begin{itemize}
-	\item alla ricezione del messaggio \textbf{robotMindCmd : robotMindCmd(explore)} viene invocato il metodo statico \textbf{doBasicStep()} della classe Java \textbf{robot}, a cui viene delegata l'esecuzione del basic step del robot. Questo metodo deve tenere conto degli eventi \textbf{sensorEvent : sensorEvent(onboardsonar)} per determinare quando il robot si è imbattuto in un ostacolo, che secondo le precedenti assunzioni viene a coincidere con il secondo sonar. In seguito a ciò viene discriminato il buon esito del basic step, determinato dalla presenza o dall'assenza di un ostacolo lungo il percorso del robot. A seconda della direzione del robot vengono incrementate le dimensioni della stanza. Il caso di fallimento del basic step in questa fase di cosiddetta "esplorazione" si verifica quando il robot colpisce il secondo sonar: in tal caso vengono invocati i metodi statici della classe \textbf{planner} necessari ad indicare al planner le dimensioni della stanza per poi passare alla fase di pulizia della stanza vera e propria con l'invio del messaggio \textbf{robotMindCmd : robotMindCmd(clean)}.
-	\item alla ricezione dell'evento \textbf{sensorEvent : sensorEvent(sonar2)} viene modificata la direzione del robot memorizzata nella base di conoscenza;
-	\item alla ricezione del messaggio \textbf{robotMindCmd : robotMindCmd(clean)} viene dapprima invocato il metodo statico \textbf{nextMove()} della classe Java \textbf{planner}, dove per planner si intende un'entità a conoscenza delle dimensioni della stanza in grado di determinare la prossima mossa del robot (basic step o basic step + rotazione di 90 gradi), inserita nella base di conoscenza di volta in volta, col fine di coprire l'intera area della stanza. A seconda della mossa indicata dal planner vengono invocati i metodi statici della classe \textbf{robot} necessari ad eseguire la mossa. \\ La pulizia della stanza si intende conclusa quando viene aggiunto dal planner alla base di conoscenza il fatto \textbf{nextMove(n,n)}, che indica al robot di non eseguire nessun movimento ulteriore. 
-\end{itemize}
-
 %=========================================================================
 
 \section{Progettazione}
 \labelsec{Project}
 %=========================================================================
 
+\begin{comment}
 \lstinputlisting[label={lst:designResourseModel},title={\footnotesize resourceModel.qa}]{../src/sprint\version/impl/it.unibo.finaltask2018.impl/src/resourceModel.qa}
 \lstinputlisting[label={lst:designOut},title={\footnotesize output.qa}]{../src/sprint\version/impl/it.unibo.finaltask2018.impl/src/output.qa}
 \lstinputlisting[label={lst:designIn}, title={\footnotesize input.qa}]{../src/sprint\version/impl/it.unibo.finaltask2018.impl/src/input.qa}
 \lstinputlisting[label={lst:designAppl},title={\footnotesize applicationLogic.qa}]{../src/sprint\version/impl/it.unibo.finaltask2018.impl/src/applicationLogic.qa}
 \lstinputlisting[label={lst:designIn}, title={\footnotesize real\_robot\_adapter.qa}]{../src/sprint\version/design/it.unibo.finaltask2018.design/src/real_robot_adapter.qa}
 \lstinputlisting[label={lst:designIn}, title={\footnotesize real\_led\_adapter.qa}]{../src/sprint\version/design/it.unibo.finaltask2018.design/src/real_led_adapter.qa}
+\end{comment}
 
 
 \section{Implementazione}
