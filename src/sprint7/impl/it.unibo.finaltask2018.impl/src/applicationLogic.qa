@@ -189,6 +189,7 @@ QActor robot_basic_movements context ctxApplicationLogic {
 		repeatPlan
 	
 	Plan handleBasicStep resumeLastPlan [
+		//TODO javaRun timestamp 1
 		emit robotMovement : robotMovement(movingForward)
 	]
 	transition
@@ -204,6 +205,7 @@ QActor robot_basic_movements context ctxApplicationLogic {
 	]
 	
 	Plan badResultBasicStep resumeLastPlan [
+		//TODO javaRun timestamp 2
 		[ ?? notFirstTry ]
 			emit basicStepResult : basicStepResult(bad)
 			//emit something_that_says_the_basic_Step_had_a_bad_result
