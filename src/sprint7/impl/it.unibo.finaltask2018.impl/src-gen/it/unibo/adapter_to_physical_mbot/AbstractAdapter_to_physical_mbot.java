@@ -75,6 +75,9 @@ public abstract class AbstractAdapter_to_physical_mbot extends QActor {
 	    try{	
 	     PlanRepeat pr = PlanRepeat.setUp("init",-1);
 	    	String myselfName = "init";  
+	    	parg = "consult(\"realRobot.pl\")";
+	    	//QActorUtils.solveGoal(myself,parg,pengine );  //sets currentActionResult		
+	    	solveGoal( parg ); //sept2017
 	    	it.unibo.myArduinoUtils.connArduino.initRasp( myself ,"115200"  );
 	    	temporaryStr = "\"adapter_to_physical_mbot STARTS\"";
 	    	println( temporaryStr );  
@@ -146,10 +149,12 @@ public abstract class AbstractAdapter_to_physical_mbot extends QActor {
 	    		//println("WARNING: variable substitution not yet fully implemented " ); 
 	    		{//actionseq
 	    		it.unibo.myArduinoUtils.connArduino.mbotLeft( myself  );
+	    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?rotDelay(DELAY)" )) != null ){
 	    		//delay  ( no more reactive within a plan)
-	    		aar = delayReactive(600,"" , "");
+	    		aar = delayReactive(Integer.parseInt(QActorUtils.substituteVars(guardVars,"DELAY").replace("'","")),"" , "");
 	    		if( aar.getInterrupted() ) curPlanInExec   = "moveRobot";
 	    		if( ! aar.getGoon() ) return ;
+	    		}
 	    		it.unibo.myArduinoUtils.connArduino.mbotStop( myself  );
 	    		};//actionseq
 	    	}
@@ -162,10 +167,12 @@ public abstract class AbstractAdapter_to_physical_mbot extends QActor {
 	    		//println("WARNING: variable substitution not yet fully implemented " ); 
 	    		{//actionseq
 	    		it.unibo.myArduinoUtils.connArduino.mbotRight( myself  );
+	    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?rotDelay(DELAY)" )) != null ){
 	    		//delay  ( no more reactive within a plan)
-	    		aar = delayReactive(600,"" , "");
+	    		aar = delayReactive(Integer.parseInt(QActorUtils.substituteVars(guardVars,"DELAY").replace("'","")),"" , "");
 	    		if( aar.getInterrupted() ) curPlanInExec   = "moveRobot";
 	    		if( ! aar.getGoon() ) return ;
+	    		}
 	    		it.unibo.myArduinoUtils.connArduino.mbotStop( myself  );
 	    		};//actionseq
 	    	}

@@ -1,6 +1,7 @@
 %====================================================================================
 % Context ctxOutput  SYSTEM-configuration: file it.unibo.ctxOutput.robot.pl 
 %====================================================================================
+context(ctxrealrobotadapter, "192.168.1.15",  "TCP", "9010" ).  		 
 context(ctxresourcemodel, "localhost",  "TCP", "8099" ).  		 
 context(ctxoutput, "localhost",  "TCP", "8098" ).  		 
 %%% -------------------------------------------

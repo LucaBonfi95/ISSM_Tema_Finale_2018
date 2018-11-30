@@ -1,12 +1,10 @@
 package it.unibo.myPlannerIntegrator;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import it.unibo.exploremap.program.aiutil;
 import aima.core.agent.Action;
-import it.unibo.qactors.QActorUtils;
+import it.unibo.exploremap.program.aiutil;
 import it.unibo.qactors.akka.QActor;
 
 public class myPlanner {

@@ -24,6 +24,7 @@ QActor adapter_to_physical_mbot context ctxRealRobotAdapter {//-pubsub {
 	}
 	
 	Plan init normal [
+		demo consult("realRobot.pl");
 //		javaRun it.unibo.myArduinoUtils.connArduino.initPc("COM6", "115200");
 		javaRun it.unibo.myArduinoUtils.connArduino.initRasp("115200");
 		println("adapter_to_physical_mbot STARTS")
@@ -46,12 +47,14 @@ QActor adapter_to_physical_mbot context ctxRealRobotAdapter {//-pubsub {
 			javaRun it.unibo.myArduinoUtils.connArduino.mbotBackward();
 		onMsg msg_modelChanged : modelChanged(resource(name(robot), state(movement(turningLeft), X))) -> {
 				javaRun it.unibo.myArduinoUtils.connArduino.mbotLeft();
-				delay 600;	//test needed
+				[ !? rotDelay(DELAY) ]
+					delay DELAY;	//test needed
 				javaRun it.unibo.myArduinoUtils.connArduino.mbotStop()
 			};
 		onMsg msg_modelChanged : modelChanged(resource(name(robot), state(movement(turningRight), X))) -> {
 				javaRun it.unibo.myArduinoUtils.connArduino.mbotRight();
-				delay 600;	//test needed
+				[ !? rotDelay(DELAY) ]
+					delay DELAY;	//test needed
 				javaRun it.unibo.myArduinoUtils.connArduino.mbotStop()
 			}
 	]

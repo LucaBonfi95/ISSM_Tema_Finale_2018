@@ -102,8 +102,9 @@ public class mbotConnTcp {
 							System.out.println("+++EVENTO COLLISION+++");
 							mbotStop(curActor);
 							//Added to avoid the state obstacleDetected remains
-							Thread.sleep(200);
+							Thread.sleep(75);
 							QActorUtils.raiseEvent(curActor, "pfrs_mbot", "obstacleDetected", "obstacleDetected(false)");
+							
 						}
 						else if(event.getString("type").equals("sonar-activated")) {
 							//emit the event sonarDetected : sonarDetected(name(NAME), somethingDetected(true), distance(VALUE))

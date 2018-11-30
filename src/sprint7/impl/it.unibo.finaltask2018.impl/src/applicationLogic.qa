@@ -59,7 +59,7 @@ QActor robot_movement_finder context ctxApplicationLogic {
 
 
 QActor blink_controller context ctxApplicationLogic {
-	// the behaviour is the same for the real led and for the hue lamp
+	// the behavior is the same for the real led and for the hue lamp
 	
 	Rules {
 		// rules needed by the application logic
@@ -86,7 +86,7 @@ QActor blink_controller context ctxApplicationLogic {
 			emit turnLed : turnLed(NAME, on)
 	]
 	transition
-		whenTime 500 -> ledBlinkingOff,
+		whenTime 200 -> ledBlinkingOff,
 		whenEvent local_BlinkOff -> ledOff
 		
 	Plan ledBlinkingOff [
@@ -95,7 +95,7 @@ QActor blink_controller context ctxApplicationLogic {
 			emit turnLed : turnLed(NAME, off)
 	]
 	transition
-		whenTime 500 -> ledBlinkingOn,
+		whenTime 200 -> ledBlinkingOn,
 		whenEvent local_BlinkOff -> ledOff
 	
 }
@@ -189,8 +189,8 @@ QActor robot_basic_movements context ctxApplicationLogic {
 		repeatPlan
 	
 	Plan handleBasicStep resumeLastPlan [
-		//TODO javaRun timestamp 1
-		emit robotMovement : robotMovement(movingForward)
+		emit robotMovement : robotMovement(movingForward);
+		javaRun it.unibo.myBasicStepUtils.myObstacleHandler.start()
 	]
 	transition
 		whenTime 300 -> goodResultBasicStep,
@@ -205,7 +205,16 @@ QActor robot_basic_movements context ctxApplicationLogic {
 	]
 	
 	Plan badResultBasicStep resumeLastPlan [
-		//TODO javaRun timestamp 2
+		javaRun it.unibo.myBasicStepUtils.myObstacleHandler.stopObstacleAndReset();
+		
+//		javaRun it.unibo.myBasicStepUtils.myObstacleHandler.stopObstacle();
+//		emit robotMovement : robotMovement(stopped);
+//		[ ?? resetBasicStep(DELAY) ] {
+//			emit robotMovement : robotMovement(movingBackward);
+//			delay DELAY;
+//			emit robotMovement : robotMovement(stopped)
+//		};
+
 		[ ?? notFirstTry ]
 			emit basicStepResult : basicStepResult(bad)
 			//emit something_that_says_the_basic_Step_had_a_bad_result
@@ -223,7 +232,7 @@ QActor robot_basic_movements context ctxApplicationLogic {
 			emit robotMovement : robotMovement(turningLeft)
 	]
 	transition
-		whenTime 300 -> goodResultRotation
+		whenTime 800 -> goodResultRotation
 		
 	Plan goodResultRotation resumeLastPlan [
 		emit rotationResult : rotationResult(good)
@@ -304,7 +313,7 @@ QActor handle_planner context ctxApplicationLogic {
 }
 
 
-QActor mock_sender context ctxApplicationLogic -g gray {
+QActor mock_sender context ctxApplicationLogic {//-g gray {
 	Plan init normal [
 		println("mock_sender STARTED")
 	]

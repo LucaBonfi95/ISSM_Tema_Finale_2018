@@ -122,7 +122,7 @@ public abstract class AbstractBlink_controller extends QActor {
 	     msgTransition( pr,myselfName,"blink_controller_"+myselfName,false,
 	          new StateFun[]{stateTab.get("ledOff") }, 
 	          new String[]{"true","E","local_BlinkOff" },
-	          500, "ledBlinkingOff" );//msgTransition
+	          200, "ledBlinkingOff" );//msgTransition
 	    }catch(Exception e_ledBlinkingOn){  
 	    	 println( getName() + " plan=ledBlinkingOn WARNING:" + e_ledBlinkingOn.getMessage() );
 	    	 QActorContext.terminateQActorSystem(this); 
@@ -143,7 +143,7 @@ public abstract class AbstractBlink_controller extends QActor {
 	     msgTransition( pr,myselfName,"blink_controller_"+myselfName,false,
 	          new StateFun[]{stateTab.get("ledOff") }, 
 	          new String[]{"true","E","local_BlinkOff" },
-	          500, "ledBlinkingOn" );//msgTransition
+	          200, "ledBlinkingOn" );//msgTransition
 	    }catch(Exception e_ledBlinkingOff){  
 	    	 println( getName() + " plan=ledBlinkingOff WARNING:" + e_ledBlinkingOff.getMessage() );
 	    	 QActorContext.terminateQActorSystem(this); 

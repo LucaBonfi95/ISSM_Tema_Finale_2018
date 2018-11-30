@@ -112,6 +112,7 @@ public abstract class AbstractRobot_basic_movements extends QActor {
 	    	String myselfName = "handleBasicStep";  
 	    	temporaryStr = QActorUtils.unifyMsgContent(pengine, "robotMovement(VALUE)","robotMovement(movingForward)", guardVars ).toString();
 	    	emit( "robotMovement", temporaryStr );
+	    	it.unibo.myBasicStepUtils.myObstacleHandler.start( myself  );
 	    	//bbb
 	     msgTransition( pr,myselfName,"robot_basic_movements_"+myselfName,true,
 	          new StateFun[]{stateTab.get("badResultBasicStep") }, 
@@ -147,6 +148,7 @@ public abstract class AbstractRobot_basic_movements extends QActor {
 	    try{	
 	     PlanRepeat pr = PlanRepeat.setUp("badResultBasicStep",-1);
 	    	String myselfName = "badResultBasicStep";  
+	    	it.unibo.myBasicStepUtils.myObstacleHandler.stopObstacleAndReset( myself  );
 	    	if( (guardVars = QActorUtils.evalTheGuard(this, " ??notFirstTry" )) != null ){
 	    	temporaryStr = QActorUtils.unifyMsgContent(pengine, "basicStepResult(VALUE)","basicStepResult(bad)", guardVars ).toString();
 	    	emit( "basicStepResult", temporaryStr );
@@ -201,7 +203,7 @@ public abstract class AbstractRobot_basic_movements extends QActor {
 	     msgTransition( pr,myselfName,"robot_basic_movements_"+myselfName,true,
 	          new StateFun[]{}, 
 	          new String[]{},
-	          300, "goodResultRotation" );//msgTransition
+	          800, "goodResultRotation" );//msgTransition
 	    }catch(Exception e_handleRotation){  
 	    	 println( getName() + " plan=handleRotation WARNING:" + e_handleRotation.getMessage() );
 	    	 QActorContext.terminateQActorSystem(this); 
