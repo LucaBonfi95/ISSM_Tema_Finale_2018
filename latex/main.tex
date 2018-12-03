@@ -286,9 +286,16 @@ I requisiti sono stati analizzati e formalizzati in modo iterativo in ordine di 
 	\caption{Product Backlog}
 	\label{tab:pb}
 \end{table}
-Per formalizzare il requisito \code{R-FloorClean} è prima necessario stabilire cosa si intenda con pulire tutto il pavimento. Introducendo l'assunzione che la stanza sia rettangolare è possibile suddividerne la superficie in celle quadrate di dimensione fissa. Il lato delle celle dovrà essere di lunghezza non superiore al lato di dimensione maggiore del robot. Occorre quindi introdurre il concetto di \textbf{basic step}, ovvero un movimento che copra la distanza pari al lato della cella. Un basic step ha successo se il robot riesce ad avanzare nella cella successiva, mentre fallisce se la cella successiva è occupata da un ostacolo fisso. Al termine di un basic step la cella in cui il robot si trova è da considerarsi pulita. Qualsiasi percorso del robot dovrà essere espresso come una sequenza di basic step e di rotazioni di 90$^{\circ}$. \\ Fatte queste premesse, pulire tutta la stanza equivale a pulire ogni cella della stanza non occupata da un ostacolo fisso. Come da requisito \code{R-Map}, se è già stata costruita una mappa della stanza, il robot segue un percorso predefinito dallo \code{start-point} all'\code{end-point}, altrimenti procede nella pulizia della stanza costruendone la mappa. 
+Per formalizzare il requisito \code{R-FloorClean} è prima necessario stabilire cosa si intenda con pulire tutto il pavimento. Introducendo l'assunzione che la stanza sia rettangolare è possibile suddividerne la superficie in celle quadrate di dimensione fissa. Un modello della stanza è rappresentato in \ref{fig:grid}. 
 
-% INSERIRE IMMAGINE CON GRIGLIA DELLA STANZA
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.5]{img/grid.PNG}
+	\caption{Modello a griglia della stanza}
+	\label{fig:grid}
+\end{figure}
+
+Il lato delle celle dovrà essere di lunghezza non superiore al lato di dimensione maggiore del robot. Occorre quindi introdurre il concetto di \textbf{basic step}, ovvero un movimento che copra la distanza pari al lato della cella. Un basic step ha successo se il robot riesce ad avanzare nella cella successiva, mentre fallisce se la cella successiva è occupata da un ostacolo fisso. Al termine di un basic step la cella in cui il robot si trova è da considerarsi pulita. Qualsiasi percorso del robot dovrà essere espresso come una sequenza di basic step e di rotazioni di 90$^{\circ}$. \\ Fatte queste premesse, pulire tutta la stanza equivale a pulire ogni cella della stanza non occupata da un ostacolo fisso. Come da requisito \code{R-Map}, se è già stata costruita una mappa della stanza, il robot segue un percorso predefinito dallo \code{start-point} all'\code{end-point}, altrimenti procede nella pulizia della stanza costruendone la mappa. 
 
 Il sistema da modellare è eterogeneo e distribuito, in particolare composto da almeno due nodi: il nodo "Robot" e il nodo "PC/Android". \\
 Per la modellazione si utilizza il linguaggio \qa\ in quanto adatto alla modellazione di sistemi distribuiti. 
@@ -332,18 +339,52 @@ Per quanto riguarda l'interazione gui-robot è più opportuno che essa sia model
 \section{Analisi del problema}
 \labelsec{ProblemAnalysis}
 
-Tenendo conto delle assunzioni e delle considerazioni già affrontate in analisi dei requisiti, assumendo inizialmente per semplicità che la stanza sia rettangolare e priva di ostacoli, il requisito \code{R-FloorClean} è stato modellato attraverso l'introduzione del QActor \textbf{robotmind}. \\ Quest'ultimo possiede una propria base di conoscenza necessaria a tenere traccia delle dimensioni della stanza e della direzione corrente del robot. Tale QActor è sensibile ai messaggi \textbf{robotMindCmd} ed agli eventi \textbf{sensorEvent}, in particolare:
+Tenendo conto delle assunzioni e delle considerazioni già affrontate in analisi dei requisiti, il primo problema è posto dal requisito \code{R-FloorClean}. \\ Tale problema consiste nello stabilire una sequenza di movimenti che portino il robot a pulire il massimo numero di celle in cui è suddivisa la stanza. Nella stanza possono essere presenti degli ostacoli di varie forme e disallineati rispetto alla griglia. In quest'ultimo caso alcune celle potrebbero essere coperte solo parzialmente da degli ostacoli. Per semplicità, si considerano tali celle come totalmente coperte dagli ostacoli. Un esempio è riportato in figura \ref{fig:obstacles}.
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.5]{img/obstacle.PNG}
+	\caption{Esempio di ostacolo fisso nella stanza}
+	\label{fig:obstacles}
+\end{figure}
+
+Gli ostacoli presenti nella stanza possono essere classificati in fissi e mobili:
+\begin{itemize}
+	\setlength\itemsep{0em}
+	\item gli ostacoli fissi occupano le stesse celle per una durata indefinita;
+	\item gli ostacoli mobili si spostano dalla cella precedentemente occupata in un'altra cella allo scadere di un dato intervallo di tempo.
+\end{itemize}
+Il robot deve essere in grado di pulire le celle momentaneamente occupate da ostacoli mobili. \\
+Nel caso in cui vi siano celle non occupate ma irraggiungibili, tali celle vengono considerate come ostacoli fissi.
+
+Per pulire la stanza in autonomia, il robot ha accesso a tre tipi di informazione:
+\begin{itemize}
+	\setlength\itemsep{0em}
+	\item la prima è fornita dal sonar montato sulla parte anteriore del robot, in grado di rilevare un ostacolo immediatamente davanti al robot;
+	\item la seconda riguarda invece le distanze dal \code{sonar1} e dal \code{sonar2}, posizionati come in figura \ref{fig:virtualrobot};
+	\item la terza riguarda i dati memorizzati durante l'esplorazione della stanza (ad esempio la mappa della stanza).
+\end{itemize}
+Per semplicità, si assume che non ci siano ostacoli nel raggio di azione dei due sonar presenti nella stanza. \\
+L'unico modo che ha il robot per rilevare la presenza di un ostacolo è tentare di effettuare un basic step nella direzione desiderata e mettersi in ascolto dell'evento emesso dal sonar anteriore.
+
+\begin{comment}
+Il requisito \code{R-FloorClean} è stato modellato attraverso l'introduzione del QActor \textbf{robotmind}. \\ Quest'ultimo possiede una propria base di conoscenza necessaria a tenere traccia delle dimensioni della stanza e della direzione corrente del robot. Tale QActor è sensibile ai messaggi \textbf{robotMindCmd} ed agli eventi \textbf{sensorEvent}, in particolare:
 \begin{itemize}
 	\item alla ricezione del messaggio \textbf{robotMindCmd : robotMindCmd(explore)} viene invocato il metodo statico \textbf{doBasicStep()} della classe Java \textbf{robot}, a cui viene delegata l'esecuzione del basic step del robot. Questo metodo deve tenere conto degli eventi \textbf{sensorEvent : sensorEvent(onboardsonar)} per determinare quando il robot si è imbattuto in un ostacolo, che secondo le precedenti assunzioni viene a coincidere con il secondo sonar. In seguito a ciò viene discriminato il buon esito del basic step, determinato dalla presenza o dall'assenza di un ostacolo lungo il percorso del robot. A seconda della direzione del robot vengono incrementate le dimensioni della stanza. Il caso di fallimento del basic step in questa fase di cosiddetta "esplorazione" si verifica quando il robot colpisce il secondo sonar: in tal caso vengono invocati i metodi statici della classe \textbf{planner} necessari ad indicare al planner le dimensioni della stanza per poi passare alla fase di pulizia della stanza vera e propria con l'invio del messaggio \textbf{robotMindCmd : robotMindCmd(clean)}.
 	\item alla ricezione dell'evento \textbf{sensorEvent : sensorEvent(sonar2)} viene modificata la direzione del robot memorizzata nella base di conoscenza;
 	\item alla ricezione del messaggio \textbf{robotMindCmd : robotMindCmd(clean)} viene dapprima invocato il metodo statico \textbf{nextMove()} della classe Java \textbf{planner}, dove per planner si intende un'entità a conoscenza delle dimensioni della stanza in grado di determinare la prossima mossa del robot (basic step o basic step + rotazione di 90 gradi), inserita nella base di conoscenza di volta in volta, col fine di coprire l'intera area della stanza. A seconda della mossa indicata dal planner vengono invocati i metodi statici della classe \textbf{robot} necessari ad eseguire la mossa. \\ La pulizia della stanza si intende conclusa quando viene aggiunto dal planner alla base di conoscenza il fatto \textbf{nextMove(n,n)}, che indica al robot di non eseguire nessun movimento ulteriore. 
 \end{itemize}
+\end{comment}
 
-Il primo problema che sorge è quello di stabilire quale nodo si occuperà di autenticare l'utente. Una possibilità è quella di relegare l'autenticazione al nodo del robot: in questo caso il robot potrebbe non disporre delle adeguate risorse computazionali per gestire il processo di autenticazione, tuttavia questo garantirebbe maggiore sicurezza. Un'altra possibilità è che l'autenticazione venga gestita da un nodo diverso rispetto a quello del robot: ciò consentirebbe di non utilizzare le risorse computazionali del robot richiedendo però maggiori accortezze sulla sicurezza. In quest'ultimo caso l'autenticazione potrebbe essere gestita dal nodo dell'utente oppure da un nodo distinto, il quale comporterebbe costi maggiori.
+Per poter entrare in esecuzione, il robot deve ricevere un comando \action{START} da un utente autorizzato. Sorge dunque il problema di stabilire quale tra i due nodi, riportati in figura \ref{fig:reqAnalysis}, si occuperà di autenticare l'utente. \\ Una possibilità è quella di relegare l'autenticazione al nodo del robot: in questo caso il robot potrebbe non disporre delle adeguate risorse computazionali per gestire il processo di autenticazione, tuttavia questo garantirebbe maggiore sicurezza. \\ Un'altra possibilità è che l'autenticazione venga gestita da un nodo diverso rispetto a quello del robot: ciò consentirebbe di non utilizzare le risorse computazionali del robot richiedendo però maggiori accortezze sulla sicurezza. In quest'ultimo caso l'autenticazione potrebbe essere gestita dal nodo dell'utente oppure da un nodo distinto, il quale comporterebbe costi maggiori. \\
 
-Un altro problema è quello dell'interfaccia \action{GUI}, che deve poter eseguire su dispositivi eterogenei. A tal proposito, una possibilità sarebbe creare client nativi per ogni piattaforma con costi elevati oppure più semplicemente utilizzare una pagina web. 
+Un altro problema è quello relativo all'interfaccia \action{GUI} che l'utente utilizza per interagire con il robot. Questa interfaccia deve poter eseguire su dispositivi eterogenei. A tal proposito, una possibilità sarebbe creare client nativi per ogni piattaforma con costi elevati oppure più semplicemente utilizzare una pagina web. 
 
 La comunicazione tra utente e robot tramite \action{GUI} può avvenire via messaggi o via eventi. La comunicazione ad eventi permette di disaccoppiare \action{GUI} e robot, consentendo di utilizzare un'unica \action{GUI} per comunicare con diversi robot. Utilizzando gli eventi può essere adottato un approccio \code{event-based} o un approccio \code{event-driven}. Nell'approccio \code{event-based} il robot non sarebbe sempre sensibile agli eventi, potendone perdere alcuni. Al contrario, nell'approccio \code{event-driven} il robot sarebbe sempre sensibile agli eventi perdendo tuttavia reattività.
+
+% INSERIRE ANALISI BLINKING
+% INSERIRE ANALISI TEMPOK E TIMEOK
+% INSERIRE DISCUSSIONE SPRINT E APPROCCIO INCREMENTALE-EVOLUTIVO (REQUISITI NON CONSIDERATI TUTTI INSIEME) 
 
 Vengono di seguito riportati i modelli formali prodotti dall'analisi del problema, in cui viene delineata l'\textbf{architettura logica} del sistema risultante dalla fase di analisi: 
 
@@ -369,7 +410,9 @@ Vengono di seguito riportati i modelli formali prodotti dall'analisi del problem
 \section{Implementazione}
 \labelsec{Implementation}
 %===========================================================================
-%
+% INSERIRE COMMENTO SU MYPLANNER: INTERFACCIA CON IL PIANIFICATORE MESSO A DISPOSIZIONE
+\lstinputlisting[label={lst:designResourseModel},title={\footnotesize resourceModel.qa}]{../src/sprint\version/impl/it.unibo.finaltask2018.impl/src/it/unibo/myPlannerIntegrator/myPlanner.java}
+% INSERIRE FILES FRONTEND SERVER E RELATIVI COMMENTI
 %===========================================================================
 %\section{Testing}
 %\labelsec{Testing}

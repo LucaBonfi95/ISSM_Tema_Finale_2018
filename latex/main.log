@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6630 64-bit) (preloaded format=pdflatex 2018.3.13)  26 OCT 2018 09:37
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6630 64-bit) (preloaded format=pdflatex 2018.3.13)  3 DEC 2018 22:48
 entering extended mode
 **./main.tex
 (main.tex
@@ -608,6 +608,13 @@ File: manifest.sty 2010/03/09 Package for adding categories, terms and keywords
  to llncs style
 \catcount=\count130
 )
+("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\tools\ver
+batim.sty"
+Package: verbatim 2014/10/28 v1.5q LaTeX2e package for verbatim enhancements
+\every@verbatim=\toks22
+\verbatim@line=\toks23
+\verbatim@in@stream=\read1
+)
 ("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\graphics\
 graphicx.sty"
 Package: graphicx 2017/06/01 v1.1a Enhanced LaTeX Graphics (DPC,SPQR)
@@ -745,32 +752,25 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 82.
 )
 \Hy@SectionHShift=\skip45
-) (main.aux
-
-LaTeX Warning: Label `lst:designIn' multiply defined.
-
-
-LaTeX Warning: Label `lst:designIn' multiply defined.
-
-)
+) (main.aux)
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 151.
-LaTeX Font Info:    ... okay on input line 151.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 151.
-LaTeX Font Info:    ... okay on input line 151.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 151.
-LaTeX Font Info:    ... okay on input line 151.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 151.
-LaTeX Font Info:    ... okay on input line 151.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 151.
-LaTeX Font Info:    ... okay on input line 151.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 151.
-LaTeX Font Info:    ... okay on input line 151.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 151.
-LaTeX Font Info:    ... okay on input line 151.
-LaTeX Info: Redefining \it@ocap on input line 151.
-LaTeX Info: Redefining \it@ccap on input line 151.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 156.
+LaTeX Font Info:    ... okay on input line 156.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 156.
+LaTeX Font Info:    ... okay on input line 156.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 156.
+LaTeX Font Info:    ... okay on input line 156.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 156.
+LaTeX Font Info:    ... okay on input line 156.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 156.
+LaTeX Font Info:    ... okay on input line 156.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 156.
+LaTeX Font Info:    ... okay on input line 156.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 156.
+LaTeX Font Info:    ... okay on input line 156.
+LaTeX Info: Redefining \it@ocap on input line 156.
+LaTeX Info: Redefining \it@ccap on input line 156.
 
 ("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\context\base\su
 pp-pdf.mkii"
@@ -780,12 +780,12 @@ pp-pdf.mkii"
 \scratchbox=\box56
 \nofMPsegments=\count142
 \nofMParguments=\count143
-\everyMPshowfont=\toks22
+\everyMPshowfont=\toks24
 \MPscratchCnt=\count144
 \MPscratchDim=\dimen137
 \MPnumerator=\count145
 \makeMPintoPDFobject=\count146
-\everyMPtoPDFconversion=\toks23
+\everyMPtoPDFconversion=\toks25
 )
 ("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\oberdiek\
 epstopdf-base.sty"
@@ -803,7 +803,7 @@ Package grfext Info: Graphics extension search list:
 )
 \c@lstlisting=\count147
 \AtBeginShipoutBox=\box57
-Package hyperref Info: Link coloring OFF on input line 151.
+Package hyperref Info: Link coloring OFF on input line 156.
 
 ("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\hyperref\
 nameref.sty"
@@ -815,18 +815,18 @@ Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
 \c@section@level=\count148
 )
-LaTeX Info: Redefining \ref on input line 151.
-LaTeX Info: Redefining \pageref on input line 151.
-LaTeX Info: Redefining \nameref on input line 151.
+LaTeX Info: Redefining \ref on input line 156.
+LaTeX Info: Redefining \pageref on input line 156.
+LaTeX Info: Redefining \nameref on input line 156.
  (main.out) (main.out)
 \@outlinefile=\write3
 \openout3 = `main.out'.
 
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 167.
+(Font)              <7> on input line 172.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 167.
-LaTeX Font Info:    Try loading font information for T1+cmtt on input line 167.
+(Font)              <5> on input line 172.
+LaTeX Font Info:    Try loading font information for T1+cmtt on input line 172.
 
 
 ("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\t1cm
@@ -852,27 +852,43 @@ Package hyperref Warning: bookmark level for unknown author defaults to 0.
 <img/virtualRobot.jpg, id=75, 311.66437pt x 274.52562pt>
 File: img/virtualRobot.jpg Graphic file (type jpg)
 <use img/virtualRobot.jpg>
-Package pdftex.def Info: img/virtualRobot.jpg  used on input line 220.
+Package pdftex.def Info: img/virtualRobot.jpg  used on input line 225.
 (pdftex.def)             Requested size: 218.16356pt x 192.16661pt.
  [4 <./img/virtualRobot.jpg>]
-LaTeX Font Info:    Try loading font information for T1+cmss on input line 258.
+Underfull \hbox (badness 10000) in paragraph at lines 263--264
+
+ []
+
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <9> on input line 268.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 268.
+<img/grid.PNG, id=84, 463.7325pt x 369.7815pt>
+File: img/grid.PNG Graphic file (type png)
+<use img/grid.PNG>
+Package pdftex.def Info: img/grid.PNG  used on input line 293.
+(pdftex.def)             Requested size: 231.86568pt x 184.89029pt.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[5]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [6 <./img/grid.PNG>]
+LaTeX Font Info:    Try loading font information for T1+cmss on input line 301.
 
 
 ("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\t1cm
 ss.fd"
 File: t1cmss.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
-<img/requirements_analysis.png, id=82, 772.8875pt x 681.54625pt>
+<img/requirements_analysis.png, id=107, 772.8875pt x 681.54625pt>
 File: img/requirements_analysis.png Graphic file (type png)
 <use img/requirements_analysis.png>
-Package pdftex.def Info: img/requirements_analysis.png  used on input line 262.
+Package pdftex.def Info: img/requirements_analysis.png  used on input line 305.
 
 (pdftex.def)             Requested size: 309.14952pt x 272.61366pt.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-[5] [6 <./img/requirements_analysis.png>]
+ [7 <./img/requirements_analysis.png>]
 ("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\lati
 n1.def"
 File: latin1.def 2015/03/17 v1.2c Input encoding file
@@ -887,74 +903,51 @@ File: se-iso-8859-1.def 2016/05/16 v1.11 stringenc: ISO-8859-1
 )
 LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <9> not available
 (Font)              Font shape `T1/cmtt/m/n' tried instead on input line 1.
- [7]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
  [8]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [9]
 ("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\lati
 n1.def"
 File: latin1.def 2015/03/17 v1.2c Input encoding file
-) [9]
-Underfull \hbox (badness 10000) in paragraph at lines 285--286
+) [10] [11]
+<img/obstacle.PNG, id=291, 454.69875pt x 372.1905pt>
+File: img/obstacle.PNG Graphic file (type png)
+<use img/obstacle.PNG>
+Package pdftex.def Info: img/obstacle.PNG  used on input line 346.
+(pdftex.def)             Requested size: 227.34882pt x 186.09479pt.
+
+Overfull \hbox (2.85071pt too wide) in paragraph at lines 355--356
+[]\T1/cmr/m/n/10 gli os-ta-coli mo-bili si spostano dalla cella prece-den-te-me
+nte oc-cu-pata in un'altra
+ []
+
+[12 <./img/obstacle.PNG>]
+Underfull \hbox (badness 10000) in paragraph at lines 379--380
 
  []
 
-[10]
-Underfull \hbox (badness 10000) in paragraph at lines 300--303
-
- []
-
-
-Overfull \hbox (9.1564pt too wide) in paragraph at lines 307--308
-[]\T1/cmr/bx/n/10 gui\T1/cmr/m/n/10 : riceve i mes-saggi \T1/cmr/bx/n/10 user-C
-md : user-Cmd(X) \T1/cmr/m/n/10 emet-tendo eventi \T1/cmr/bx/n/10 robotCmd
- []
-
-[11]
+[13]
 ("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\lati
 n1.def"
 File: latin1.def 2015/03/17 v1.2c Input encoding file
-) [12]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [13]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [14]
+) [14]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [15]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [16]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [17]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [18]
 ("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\lati
 n1.def"
 File: latin1.def 2015/03/17 v1.2c Input encoding file
-) [17]
-Overfull \hbox (10.93158pt too wide) in paragraph at lines 327--328
-[]\T1/cmr/m/n/10 In con-seguenza a quanto emerso dall'analisi dei req-ui-siti, 
-il sis-tema \T1/cmtt/m/n/10 systemRobot
- []
-
-[18]
-Overfull \hbox (2.71185pt too wide) in paragraph at lines 337--338
-\T1/cmr/m/n/10 sod-dis-fatti rispet-ti-va-mente il req-ui-sito di tem-per-atura
- ed il req-ui-sito di tempo,
- []
-
-
-Overfull \hbox (8.2605pt too wide) in paragraph at lines 337--338
-\T1/cmr/m/n/10 ed in caso con-trario viene emesso l'evento \T1/cmr/bx/n/10 out-
-Cmd : out-Cmd(stopblinking)
- []
-
-[19]
-Overfull \hbox (11.59859pt too wide) in paragraph at lines 348--349
-\T1/cmr/m/n/10 che, una volta au-t-en-ti-cato, può in-viare mes-saggi \T1/cmr/b
-x/n/10 user-Cmd : user-Cmd(cmdstart)
- []
-
-
+) [19]
 ("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\lati
 n1.def"
 File: latin1.def 2015/03/17 v1.2c Input encoding file
@@ -962,107 +955,60 @@ File: latin1.def 2015/03/17 v1.2c Input encoding file
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [21]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [22]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [23]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [24]
-("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\lati
-n1.def"
-File: latin1.def 2015/03/17 v1.2c Input encoding file
-) [25]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [26]
-("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\lati
-n1.def"
-File: latin1.def 2015/03/17 v1.2c Input encoding file
-) [27]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [28]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [29]
-("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\lati
-n1.def"
-File: latin1.def 2015/03/17 v1.2c Input encoding file
-) [30]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [31]
-("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\lati
-n1.def"
-File: latin1.def 2015/03/17 v1.2c Input encoding file
-) [32]
-("C:\Users\Antonio Grasso\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\lati
-n1.def"
-File: latin1.def 2015/03/17 v1.2c Input encoding file
-) [33] [34]
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <9> on input line 394.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 394.
-<img/foto_authA.jpg, id=1284, 222.8325pt x 301.125pt>
+[22]
+<img/foto_authA.jpg, id=712, 222.8325pt x 301.125pt>
 File: img/foto_authA.jpg Graphic file (type jpg)
 <use img/foto_authA.jpg>
-Package pdftex.def Info: img/foto_authA.jpg  used on input line 399.
+Package pdftex.def Info: img/foto_authA.jpg  used on input line 447.
 (pdftex.def)             Requested size: 89.13141pt x 120.44786pt.
-<img/foto_authB.jpg, id=1285, 319.1925pt x 508.90125pt>
+<img/foto_authB.jpg, id=713, 319.1925pt x 508.90125pt>
 File: img/foto_authB.jpg Graphic file (type jpg)
 <use img/foto_authB.jpg>
-Package pdftex.def Info: img/foto_authB.jpg  used on input line 400.
+Package pdftex.def Info: img/foto_authB.jpg  used on input line 448.
 (pdftex.def)             Requested size: 82.98808pt x 132.3112pt.
-<img/foto_authC.png, id=1286, 108.405pt x 120.45pt>
+<img/foto_authC.png, id=714, 108.405pt x 120.45pt>
 File: img/foto_authC.png Graphic file (type png)
 <use img/foto_authC.png>
-Package pdftex.def Info: img/foto_authC.png  used on input line 401.
+Package pdftex.def Info: img/foto_authC.png  used on input line 449.
 (pdftex.def)             Requested size: 108.40472pt x 120.44969pt.
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 412.
- [35 <./img/foto_authA.jpg> <./img/foto_authB.jpg> <./img/foto_authC.png>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 412.
- (main.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 412.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 412.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 460.
+ [23 <./img/foto_authA.jpg> <./img/foto_authB.jpg> <./img/foto_authC.png>]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 460.
+
+(main.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 460.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 460.
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: 9984BB20A40147431FAE8B8EC9A302B4;624.
-
-
-LaTeX Warning: There were multiply-defined labels.
-
  ) 
 Here is how much of TeX's memory you used:
- 10303 strings out of 493305
- 151827 string characters out of 3125885
- 480806 words of memory out of 3000000
- 12561 multiletter control sequences out of 15000+200000
- 14505 words of font info for 33 fonts, out of 3000000 for 9000
+ 9695 strings out of 493305
+ 140764 string characters out of 3125885
+ 499310 words of memory out of 3000000
+ 12503 multiletter control sequences out of 15000+200000
+ 15281 words of font info for 34 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 30i,13n,40p,1245b,2356s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 29i,13n,40p,1127b,2348s stack positions out of 5000i,500n,10000p,200000b,50000s
  <C:\Users\Antonio Grasso\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\e
 c\dpi600\ecrm0500.pk> <C:\Users\Antonio Grasso\AppData\Local\MiKTeX\2.9\fonts\p
 k\ljfour\jknappen\ec\dpi600\ecsi1000.pk> <C:\Users\Antonio Grasso\AppData\Local
-\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ectt1000.pk> <C:\Users\Antonio G
-rasso\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1000.pk> 
+\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx0900.pk> <C:\Users\Antonio G
+rasso\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ectt1000.pk> 
 <C:\Users\Antonio Grasso\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\d
-pi600\ecbx1200.pk> <C:\Users\Antonio Grasso\AppData\Local\MiKTeX\2.9\fonts\pk\l
-jfour\jknappen\ec\dpi600\ecti1000.pk> <C:\Users\Antonio Grasso\AppData\Local\Mi
-KTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ectt0900.pk> <C:\Users\Antonio Gras
-so\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm0900.pk> <C:
+pi600\ecbx1000.pk> <C:\Users\Antonio Grasso\AppData\Local\MiKTeX\2.9\fonts\pk\l
+jfour\jknappen\ec\dpi600\ecbx1200.pk> <C:\Users\Antonio Grasso\AppData\Local\Mi
+KTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecti1000.pk> <C:\Users\Antonio Gras
+so\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ectt0900.pk> <C:
 \Users\Antonio Grasso\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi6
-00\ecrm1000.pk> <C:\Users\Antonio Grasso\AppData\Local\MiKTeX\2.9\fonts\pk\ljfo
-ur\jknappen\ec\dpi600\ecbx1440.pk><C:/Users/Antonio Grasso/AppData/Local/Progra
-ms/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/Antonio Grass
-o/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><
-C:/Users/Antonio Grasso/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/am
-sfonts/cm/cmsy7.pfb>
-Output written on main.pdf (35 pages, 592421 bytes).
+00\ecrm0900.pk> <C:\Users\Antonio Grasso\AppData\Local\MiKTeX\2.9\fonts\pk\ljfo
+ur\jknappen\ec\dpi600\ecrm1000.pk> <C:\Users\Antonio Grasso\AppData\Local\MiKTe
+X\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1440.pk><C:/Users/Antonio Grasso/A
+ppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/
+Users/Antonio Grasso/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfo
+nts/cm/cmsy7.pfb>
+Output written on main.pdf (23 pages, 482886 bytes).
 PDF statistics:
- 1919 PDF objects out of 2073 (max. 8388607)
- 1117 named destinations out of 1200 (max. 500000)
- 106 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1240 PDF objects out of 1440 (max. 8388607)
+ 574 named destinations out of 1000 (max. 500000)
+ 116 words of extra memory for PDF output out of 10000 (max. 10000000)
 
