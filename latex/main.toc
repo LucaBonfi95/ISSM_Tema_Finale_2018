@@ -1,4 +1,4 @@
-\babel@toc {english}{}
+\select@language {english}
 \contentsline {title}{Software Engineering process}{1}{chapter.1}
 \authcount {1}
 \contentsline {author}{Luca Bonfiglioli, Nicola Fava, Antonio Grasso}{1}{chapter.1}

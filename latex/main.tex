@@ -413,6 +413,17 @@ Vengono di seguito riportati i modelli formali prodotti dall'analisi del problem
 % INSERIRE COMMENTO SU MYPLANNER: INTERFACCIA CON IL PIANIFICATORE MESSO A DISPOSIZIONE
 \lstinputlisting[label={lst:designResourseModel},title={\footnotesize resourceModel.qa}]{../src/sprint\version/impl/it.unibo.finaltask2018.impl/src/it/unibo/myPlannerIntegrator/myPlanner.java}
 % INSERIRE FILES FRONTEND SERVER E RELATIVI COMMENTI
+L'implementazione del frontend server, necessario per fornire all'utente la possibilità di autenticarsi e quindi di dare i comandi di inizio e stop al robot, è avvenuta in \node, sfruttando il framework Express. In figura \ref{fig:frontend} è presente un modello informale che rappresenta le tecnologie utilizzate nell'integrazione fra il frontend server e l'infrastruttura \qa\ già presente.
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.5]{img/frontend.png}
+	\caption{Architettura informale che rappresenta l'integrazione del frontend server con l'infrastruttura \qa}
+	\label{fig:frontend}
+\end{figure}
+
+Come si può vedere la comunicazione tra la pagina web fornita all'utente e il server web avviene tramite \action{socket.io} e rimane pienamente in ambiente \node. La comunicazione con l'infrastruttura \qa\ utilizza invece una \action{TCP socket} nativa del contesto; la comunicazione nella direzione opposta avviene invece tramite un server \action{mqtt}.
+
 %===========================================================================
 %\section{Testing}
 %\labelsec{Testing}
