@@ -84,6 +84,10 @@ compile group: 'com.googlecode.aima-java', name: 'aima-core', version: '3.0.0'
  	
  	// library for OpenWeatherMap API
  	compile 'net.aksingh:owm-japis:2.5.2.2'
+ 	
+ 	// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
+	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.6'
+ 	
 	  
 /*
 JSON
