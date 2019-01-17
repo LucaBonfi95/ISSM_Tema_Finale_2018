@@ -4,3 +4,8 @@
 	2.2. far partire mosquitto
 3. far partire il file nel progetto auth/frontendServer.js
 4. far partire in ordine l'applicazione QActor
+	4.1. resourceModel
+	4.2. frontend
+	4.3. output
+	4.4. input
+	4.5. applicationLogic

@@ -4,7 +4,7 @@ Event updateTemperature : updateTemperature(NAME, NEW_TEMP)
 Event updateTime		: updateTime(NAME, CURRENT_TIME)
 Event turnLed 			: turnLed(NAME, NEW_STATE)
 Event temperatureIsOk	: temperatureIsOk(STATE)
-Event timeIsOk	: timeIsOk(STATE)
+Event timeIsOk			: timeIsOk(STATE)
 
 Event modelChanged 		: modelChanged(resource(NAME, STATE))
 

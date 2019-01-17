@@ -16,7 +16,7 @@ var socket = null;
 //var socket = net.connect({ port: localhost, host: 8021 });
 
 
-var frontendQaNodePort = 8020;
+var frontendQaNodePort = 8095;
 var frontendQaNodeHost = "localhost";
 
 var counter = 1;

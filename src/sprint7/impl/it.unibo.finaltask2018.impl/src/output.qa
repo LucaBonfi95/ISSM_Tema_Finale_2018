@@ -15,7 +15,7 @@ Dispatch msg_modelChanged : modelChanged(resource(NAME, STATE))
 // questa invece per il led sul robot reale
 //Context ctxRealLedAdapter ip[host="192.168.43.225" port=9011] -standalone 
 
-Context ctxRealRobotAdapter ip[host="192.168.1.15" port=9010] -standalone 
+//Context ctxRealRobotAdapter ip[host="192.168.1.15" port=9010] -standalone 
 
 
 // se si usa con il robot fisico al posto di localhost bisogna mettere l'indirizzo del pc

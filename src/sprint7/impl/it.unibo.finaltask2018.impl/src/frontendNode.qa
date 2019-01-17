@@ -14,7 +14,7 @@ Event modelChanged : modelChanged(RES)
 pubSubServer "tcp://localhost:1883"
 
 Context ctxResourceModel ip[host="localhost" port=8099] -standalone 
-Context ctxFrontend ip[host="localhost" port=8020]
+Context ctxFrontend ip[host="localhost" port=8095]
 
 QActor qa2frontend context ctxFrontend {
 	Plan init normal [
@@ -50,7 +50,7 @@ QActor frontend2qa context ctxFrontend {
 		repeatPlan
 		
 	Plan handleEvent resumeLastPlan [
-		onEvent local_userstart : userstart(X) -> emit userstart : userstart(X);
-		onEvent local_userstop : userstop(X) -> emit userstop : userstop(X)
+		onEvent local_userstart : userstart(X) -> emit userstart : userstart(user);
+		onEvent local_userstop : userstop(X) -> emit userstop : userstop(user)
 	]
 }

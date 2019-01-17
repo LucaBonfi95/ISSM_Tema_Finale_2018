@@ -27,10 +27,10 @@
 				"movingBackward": "moving backward",
 				"movingForward": "moving forward"
 			}[state];
-		if(name == "robot.obstacleDetected" || name.match("sonar+somethingDetected"))
+		if(name == "robot.obstacleDetected" || name.match("sonar.\.somethingDetected"))
 			return {
-				"true": "",
-				"false": "not "
+				"true": " ",
+				"false": " not "
 			}[state];
 		if(name == "led.state" || name == "temp.temperature")
 			return state;

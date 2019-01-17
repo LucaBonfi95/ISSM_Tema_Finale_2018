@@ -28,12 +28,14 @@ Dispatch noMoreMoves	: noMoreMoves
 Context ctxResourceModel ip[host="localhost" port=8099] -standalone 
 Context ctxApplicationLogic ip[host="localhost" port=8097]
 
+EventHandler log_start for userstop -print;
 
 QActor robot_movement_finder context ctxApplicationLogic {
 	Plan init normal [
 		println("robot_movement_finder STARTED")
 	]
-	switchTo waitForModelChanged
+	//switchTo waitForModelChanged
+	switchTo waitForUserStartOrStop
 	
 	Plan waitForModelChanged []
 	transition
@@ -54,6 +56,22 @@ QActor robot_movement_finder context ctxApplicationLogic {
 			
 		onEvent modelChanged : modelChanged(resource(name(robot),state(movement(movingForward),obstacleDetected(true)))) ->
 			emit local_BlinkOff : blinkOff
+	]
+	
+	Plan waitForUserStartOrStop []
+	transition
+		stopAfter 1000000
+		whenEvent userstart -> startBlinking,
+		whenEvent userstop -> stopBlinking
+	finally
+		repeatPlan
+		
+	Plan startBlinking resumeLastPlan [
+		emit local_BlinkOn : blinkOn
+	]
+	
+	Plan stopBlinking resumeLastPlan [
+		emit local_BlinkOff : blinkOff
 	]
 }
 
@@ -317,7 +335,7 @@ QActor mock_sender context ctxApplicationLogic {//-g gray {
 	Plan init normal [
 		println("mock_sender STARTED")
 	]
-	switchTo move
+	//switchTo move
 	
 	Plan move [
 		delay 2500;

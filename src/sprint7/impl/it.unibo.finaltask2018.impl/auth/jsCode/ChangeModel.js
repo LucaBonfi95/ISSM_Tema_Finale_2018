@@ -64,6 +64,14 @@ function modifyResource(res) {
 		server.updateClient("led.state#" + res.state);
 		break;
 	case "sonar1":
+		var values = res.state.split(",").map(myValueOf);
+		resources[res.name].somethingDetected = values[0];
+		resources[res.name].distance = values[1];
+		//send via socket.io res.name + ".somethingDetected#" + values[0]
+		//send via socket.io res.name + ".distance#" + values[1]
+		server.updateClient(res.name + ".somethingDetected#" + values[0]);
+		server.updateClient(res.name + ".distance#" + values[1]);
+		break;
 	case "sonar2":
 		var values = res.state.split(",").map(myValueOf);
 		resources[res.name].somethingDetected = values[0];
