@@ -260,7 +260,13 @@ Durante il suo funzionamento il robot può opzionalmente:
 \section{Analisi dei requisiti}
 \labelsec{ReqAnalysis}
 
-I requisiti sono stati analizzati e formalizzati in modo iterativo in ordine di importanza, come riportato nel Product Backlog di Table \ref{tab:pb}. \\
+% INSERIRE DISCUSSIONE SPRINT E APPROCCIO INCREMENTALE-EVOLUTIVO (REQUISITI NON CONSIDERATI TUTTI INSIEME) 
+Il processo di produzione del software è stato impostato secondo il framework di sviluppo agile \textbf{scrum}. La collaborazione interna tra i membri del team ed esterna tra il team e il committente è stata al centro del processo. Il lavoro è stato suddiviso in cicli orientati alla realizzazione di prototipi funzionanti, incrementalmente estendibili lungo due direzioni:
+\begin{itemize}
+	\setlength\itemsep{0em}
+	\item una direzione riguardante l'aggiunta incrementale dei requisiti;
+	\item una direzione relativa al passaggio dalla logica definita in fase di analisi alle tecnologie scelte in progettazione e implementazione.
+\end{itemize}
 
 % INSERISCI TABELLA PRODUCT BACKLOG
 \begin{table}
@@ -286,6 +292,9 @@ I requisiti sono stati analizzati e formalizzati in modo iterativo in ordine di 
 	\caption{Product Backlog}
 	\label{tab:pb}
 \end{table}
+In prima istanza, vengono stabilite le priorità dei requisiti, riportate nel \textbf{Product Backlog} di Table \ref{tab:pb}.
+Stabilito l'ordine prioritario dei requisiti, questi vengono analizzati e formalizzati in modo iterativo in ordine di importanza.
+
 Per formalizzare il requisito \code{R-FloorClean} è prima necessario stabilire cosa si intenda con pulire tutto il pavimento. Introducendo l'assunzione che la stanza sia rettangolare è possibile suddividerne la superficie in celle quadrate di dimensione fissa. Un modello della stanza è rappresentato in \ref{fig:grid}. 
 
 \begin{figure}[h!]
@@ -297,8 +306,21 @@ Per formalizzare il requisito \code{R-FloorClean} è prima necessario stabilire 
 
 Il lato delle celle dovrà essere di lunghezza non superiore al lato di dimensione maggiore del robot. Occorre quindi introdurre il concetto di \textbf{basic step}, ovvero un movimento che copra la distanza pari al lato della cella. Un basic step ha successo se il robot riesce ad avanzare nella cella successiva, mentre fallisce se la cella successiva è occupata da un ostacolo fisso. Al termine di un basic step la cella in cui il robot si trova è da considerarsi pulita. Qualsiasi percorso del robot dovrà essere espresso come una sequenza di basic step e di rotazioni di 90$^{\circ}$. \\ Fatte queste premesse, pulire tutta la stanza equivale a pulire ogni cella della stanza non occupata da un ostacolo fisso. Come da requisito \code{R-Map}, se è già stata costruita una mappa della stanza, il robot segue un percorso predefinito dallo \code{start-point} all'\code{end-point}, altrimenti procede nella pulizia della stanza costruendone la mappa. 
 
-Il sistema da modellare è eterogeneo e distribuito, in particolare composto da almeno due nodi: il nodo "Robot" e il nodo "PC/Android". \\
-Per la modellazione si utilizza il linguaggio \qa\ in quanto adatto alla modellazione di sistemi distribuiti. 
+Il sistema da modellare è \textbf{eterogeneo e distribuito}, in particolare composto da \textbf{almeno due nodi}: il nodo "Robot" e il nodo "PC/Android". \\
+Trattandosi di un sistema eterogeneo distribuito, i componenti all'interno del sistema possono interagire tramite:
+\begin{itemize}
+	\setlength\itemsep{0em}
+	\item \textbf{messaggi}: informazioni che il mittente invia ad uno \textbf{specifico destinatario};
+	\item \textbf{eventi}: informazioni \textbf{senza specifico destinatario} che possono essere ricevuta da tutti i componenti del sistema interessati agli eventi stessi.
+\end{itemize}
+In particolare, le entità coinvolte nelle interazioni possono essere distinte in:
+\begin{itemize}
+	\setlength\itemsep{0em}
+	\item \code{message/event-based}: l'entità stabilisce se e come gestire i messaggi e gli eventi. Nel caso di entità message-based ci può essere la possibilità che l'entità non riceva immediatamente il messaggio, che viene messo in una coda prima di essere recapitato. Nel caso invece di entità event-based è possibile che l'entità possa perdere gli eventi.
+	\item \code{message/event-driven}: l'entità è guidata nel suo comportamento indipendentemente dalla sua volontà.	
+\end{itemize}
+
+Per la modellazione è possibile utilizzare il linguaggio \qa, che risulta adatto alla modellazione di sistemi distribuiti eterogenei. 
 
 \begin{figure}[h]
 	\centering
@@ -316,23 +338,24 @@ L'attore "Robot" si occupa inoltre di gestire la logica applicativa, che consist
 Inoltre, se l'attore "Robot" trova un ostacolo che non riesce ad evitare si deve fermare (\code{R-Obstacle}).
 Questa situazione si verifica quando il robot trova uno o più ostacoli che gli impediscono di raggiungere il secondo sonar.
 
+Analizzando i requisiti emerge la necessità di interazione tra:
+\begin{itemize}
+	\setlength\itemsep{0em}
+	\item il robot e i sonar;
+	\item il robot e le sorgenti di tempo e temperatura;
+	\item il robot e i dispositivi attuatori, che da requisiti vengono a coincidere con il led e la lampada hue.
+\end{itemize}
 
+Sarebbe possibile modellare queste interazioni come messaggi: in questo caso sia i sonar che le sorgenti di temperatura e tempo dovrebbero conoscere lo specifico destinatario dei loro messaggi; allo stesso modo il robot dovrebbe conoscere i specifici dispositivi attuatori a cui inviare le informazioni. \\
+Alla luce di ciò risulta più conveniente modellare queste interazioni tramite eventi, che permettono un maggiore disaccoppiamento delle entità in gioco, consentendo eventualmente a più robot distinti di raccogliere i dati in input e a differenti attuatori di ricevere comandi dal robot. 
+
+Per quanto riguarda l'interazione user-GUI non si evidenziano particolari differenze nel modellarla tramite messaggi piuttosto che tramite eventi. 
+In merito all'interazione gui-robot risulta invece più opportuno che venga modellata mediante eventi piuttosto che messaggi, in quanto risultano più vantaggiosi per disaccoppiare l'interfaccia grafica dallo specifico robot comandato. 
 
 Vengono di seguito riportati i modelli formali risultati dall'analisi dei requisiti che evidenziano una prima \textbf{architettura logica}:
 
 \lstinputlisting[label={lst:reqAnalysisRobot}, title={\footnotesize reqAnalysisRobot.qa}]{../src/sprint\version/req_analysis/reqAnalysisRobot.qa}
 \lstinputlisting[label={lst:reqAnalysisUser}, title={\footnotesize reqAnalysisUser.qa}]{../src/sprint\version/req_analysis/reqAnalysisUser.qa}
-
-Trattandosi di un sistema eterogeneo distribuito, ed utilizzando il linguaggio di modellazione \action{QActor}, le due modalità con cui i componenti all'interno del sistema possono interagire sono quelle ad \textbf{eventi} e \textbf{messaggi}. 
-
-In questo ambito un \textbf{messaggio} non è altro che un'informazione che il mittente invia ad uno \textbf{specifico destinatario}; al contrario, un \textbf{evento} cattura il concetto di informazione \textbf{senza specifico destinatario}: tutti i componenti del sistema interessati all'evento possono riceverlo. 
-
-Dall'analisi dei requisiti sono emerse le necessità di interazione tra i sonar ed il robot, tra le sorgenti dei dati di temperatura e tempo ed il robot, nonché tra il robot stesso e i dispositivi attuatori, in questo caso led e lampada hue. \\
-Sarebbe possibile modellare queste interazioni come messaggi: in questo caso sia i sonar che le sorgenti di temperatura e tempo dovrebbero conoscere lo specifico destinatario dei loro messaggi; allo stesso modo il robot dovrebbe conoscere i specifici dispositivi attuatori a cui inviare le informazioni. \\
-Alla luce di ciò risulta più conveniente modellare queste interazioni tramite eventi, che permettono un maggiore disaccoppiamento delle entità in gioco, consentendo eventualmente a più robot distinti di raccogliere i dati in input e a differenti attuatori di ricevere comandi dal robot. 
-
-Per quanto riguarda l'interazione user-GUI non si evidenziano particolari differenze nel modellarla tramite messaggi piuttosto che tramite eventi. 
-Per quanto riguarda l'interazione gui-robot è più opportuno che essa sia modellata mediante eventi piuttosto che attraverso messaggi, in quanto risultano più vantaggiosi per disaccoppiare l'interfaccia grafica dallo specifico robot comandato. 
 
 %=========================================================================
 
@@ -376,15 +399,23 @@ Il requisito \code{R-FloorClean} è stato modellato attraverso l'introduzione de
 \end{itemize}
 \end{comment}
 
+% INSERIRE ANALISI BLINKING
+Quando il robot è in movimento i requisiti \code{R-BlinkLed} e \code{R-BlinkHue} pongono il problema di far lampeggiare un dispositivo attuatore, che coincide con un \action{Led} nel caso di \fname{real} robot e con una \action{Led Hue Lamp} nel caso di \fname{virtual} robot. \\
+L'interazione robot-dispositivo attuatore può essere modellata tramite messaggi o tramite eventi: l'utilizzo degli eventi per la gestione del blinking consente un maggiore disaccoppiamento tra il robot e i possibili dispositivi attuatori che vengono utilizzati. 
+Occorre inoltre distinguere due possibilità di configurazione del comportamento:
+\begin{itemize}
+	\setlength\itemsep{0em}
+	\item la prima prevede che gli eventi di gestione del blinking relativi al \fname{real} e al \fname{virtual} robot vengano gestiti dallo stesso attore. In tal caso possono emergere problemi nel caso si vogliano comportamenti differenti dei dispositivi attuatori a seconda del tipo di robot che è in movimento;
+	\item la seconda prevede che gli eventi di gestione del blinking vengano gestiti da due attori differenti a seconda del tipo di robot che è in movimento. Questa seconda opzione garantisce maggiore disaccoppiamento tra il tipo di robot e i dispositivi attuatori che devono lampeggiare.
+\end{itemize}
+
 Per poter entrare in esecuzione, il robot deve ricevere un comando \action{START} da un utente autorizzato. Sorge dunque il problema di stabilire quale tra i due nodi, riportati in figura \ref{fig:reqAnalysis}, si occuperà di autenticare l'utente. \\ Una possibilità è quella di relegare l'autenticazione al nodo del robot: in questo caso il robot potrebbe non disporre delle adeguate risorse computazionali per gestire il processo di autenticazione, tuttavia questo garantirebbe maggiore sicurezza. \\ Un'altra possibilità è che l'autenticazione venga gestita da un nodo diverso rispetto a quello del robot: ciò consentirebbe di non utilizzare le risorse computazionali del robot richiedendo però maggiori accortezze sulla sicurezza. In quest'ultimo caso l'autenticazione potrebbe essere gestita dal nodo dell'utente oppure da un nodo distinto, il quale comporterebbe costi maggiori. \\
 
 Un altro problema è quello relativo all'interfaccia \action{GUI} che l'utente utilizza per interagire con il robot. Questa interfaccia deve poter eseguire su dispositivi eterogenei. A tal proposito, una possibilità sarebbe creare client nativi per ogni piattaforma con costi elevati oppure più semplicemente utilizzare una pagina web. 
 
-La comunicazione tra utente e robot tramite \action{GUI} può avvenire via messaggi o via eventi. La comunicazione ad eventi permette di disaccoppiare \action{GUI} e robot, consentendo di utilizzare un'unica \action{GUI} per comunicare con diversi robot. Utilizzando gli eventi può essere adottato un approccio \code{event-based} o un approccio \code{event-driven}. Nell'approccio \code{event-based} il robot non sarebbe sempre sensibile agli eventi, potendone perdere alcuni. Al contrario, nell'approccio \code{event-driven} il robot sarebbe sempre sensibile agli eventi perdendo tuttavia reattività.
+La comunicazione tra utente e robot tramite \action{GUI} può avvenire via messaggi o via eventi. La comunicazione ad eventi permette di disaccoppiare \action{GUI} e robot, consentendo di utilizzare un'unica \action{GUI} per comunicare con diversi robot. Usando l'approccio \code{event-based}, il robot potrebbe non essere sensibile a tutti gli eventi, potendone perdere alcuni. Al contrario, utilizzando l'approccio \code{event-driven}, il robot sarebbe sempre sensibile agli eventi, perdendo tuttavia reattività.
 
-% INSERIRE ANALISI BLINKING
-% INSERIRE ANALISI TEMPOK E TIMEOK
-% INSERIRE DISCUSSIONE SPRINT E APPROCCIO INCREMENTALE-EVOLUTIVO (REQUISITI NON CONSIDERATI TUTTI INSIEME) 
+I requisiti \code{R-TempOk} e \code{R-TimeOk} pongono invece il problema della comunicazione tra le sorgenti dei dati di temperatura e tempo e il robot. Le sorgenti di dati possono essere modellate come entità che emettono eventi a ripetizione aggiornando i valori di tempo e temperatura correnti. In tal caso si rende necessaria la gestione degli eventi di aggiornamento di tempo e temperatura: se la sensibilità ai cambiamenti di questi valori rappresenta un requisito fondamentale risulta più opportuno applicare un approccio \code{event-driven}; se al contrario la reattività del robot è considerata un requisito essenziale, risulta migliore l'approccio \code{event-based}, che comporterebbe la possibilità di perdere alcuni eventi.
 
 Vengono di seguito riportati i modelli formali prodotti dall'analisi del problema, in cui viene delineata l'\textbf{architettura logica} del sistema risultante dalla fase di analisi: 
 
@@ -396,16 +427,29 @@ Vengono di seguito riportati i modelli formali prodotti dall'analisi del problem
 \section{Progettazione}
 \labelsec{Project}
 %=========================================================================
+Avendo a disposizione l'architettura logica individuata in fase di analisi, risulta possibile impostare la progettazione del sistema che risolve il problema definito dai requisiti.
 
-\begin{comment}
+Il sistema può essere visto come il risultato dell'interazione e del comportamento di entità modellabili come risorse, quali i robot, i sensori di tempo e temperatura, i dispositivi attuatori (led e lampada Hue) e i sonar. \\
+Per questo motivo, si sceglie di adottare un'architettura di progetto esagonale con il modello delle risorse al centro, in cui ogni risorsa è modellata con un nome e uno stato.
+Oltre al modello delle risorse si rende necessario modellare la logica applicativa, che agisce come observer del modello delle risorse: cambiamenti dello stato di una risorsa si ripercuotono sulla logica applicativa, che va a modificare conseguentemente lo stato della risorsa nel modello delle risorse.
+Per l'input/output viene utilizzato un frontend server, che consente sia ad un utente umano sia a un'altra macchina di modificare il modello delle risorse in modo uniforme, permettendo quindi una duplice interazione human-to-machine e machine-to-machine.
+Questo garantisce disaccoppiamento tra il modello delle risorse e la logica applicativa, che può essere modificata facilmente senza impatti sull'esterno.
+Tra le risorse fisiche e il modello delle risorse si sceglie di interporre degli adapter specifici per le particolari risorse fisiche, al fine di garantire disaccoppiamento tra le risorse fisiche e la logica applicativa.
+
+Resource model:
 \lstinputlisting[label={lst:designResourseModel},title={\footnotesize resourceModel.qa}]{../src/sprint\version/impl/it.unibo.finaltask2018.impl/src/resourceModel.qa}
-\lstinputlisting[label={lst:designOut},title={\footnotesize output.qa}]{../src/sprint\version/impl/it.unibo.finaltask2018.impl/src/output.qa}
-\lstinputlisting[label={lst:designIn}, title={\footnotesize input.qa}]{../src/sprint\version/impl/it.unibo.finaltask2018.impl/src/input.qa}
+Teoria prolog:
+\lstinputlisting{../src/sprint\version/impl/it.unibo.finaltask2018.impl/resourceModel.pl}
+Application logic:
 \lstinputlisting[label={lst:designAppl},title={\footnotesize applicationLogic.qa}]{../src/sprint\version/impl/it.unibo.finaltask2018.impl/src/applicationLogic.qa}
-\lstinputlisting[label={lst:designIn}, title={\footnotesize real\_robot\_adapter.qa}]{../src/sprint\version/design/it.unibo.finaltask2018.design/src/real_robot_adapter.qa}
-\lstinputlisting[label={lst:designIn}, title={\footnotesize real\_led\_adapter.qa}]{../src/sprint\version/design/it.unibo.finaltask2018.design/src/real_led_adapter.qa}
-\end{comment}
-
+Input:
+\lstinputlisting[label={lst:designIn}, title={\footnotesize input.qa}]{../src/sprint\version/impl/it.unibo.finaltask2018.impl/src/input.qa}
+Output:
+\lstinputlisting[label={lst:designOut},title={\footnotesize output.qa}]{../src/sprint\version/impl/it.unibo.finaltask2018.impl/src/output.qa}
+Real robot adapter:
+\lstinputlisting[label={lst:designRobAd}, title={\footnotesize real\_robot\_adapter.qa}]{../src/sprint\version/design/it.unibo.finaltask2018.design/src/real_robot_adapter.qa}
+Real led adapter:
+\lstinputlisting[label={lst:designLedAd}, title={\footnotesize real\_led\_adapter.qa}]{../src/sprint\version/design/it.unibo.finaltask2018.design/src/real_led_adapter.qa}
 
 \section{Implementazione}
 \labelsec{Implementation}
